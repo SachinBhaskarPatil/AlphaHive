@@ -1,5 +1,10 @@
-# Python
+# =============================================================================
+# Market-Rover — root .gitignore
+# =============================================================================
+
+# ----- Python -----
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -12,8 +17,6 @@ eggs/
 .eggs/
 lib/
 lib64/
-# Allow frontend source lib directories (not Python lib folders)
-!pledge_rover/frontend/src/lib/
 parts/
 sdist/
 var/
@@ -21,64 +24,102 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+# Allow frontend source lib directories (not Python lib folders)
+!pledge_rover/frontend/src/lib/
+!market_rover/frontend/src/lib/
 
-# Virtual Environment
+# Virtual environments
 venv/
 ENV/
 env/
+.venv/
+**/.venv/
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# Environment variables
-.env
-.env.local
-
-# Reports and outputs (generated files only)
-reports/*.txt
-reports/*.html
-reports/*.pdf
-
-# Uploads (user data only)
-uploads/*.csv
-
-# Logs and metrics
-logs/
-*.log
-metrics/
-metrics_*.json
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Streamlit
-.streamlit/secrets.toml
-
-# Testing
+# ----- Testing / coverage -----
 .pytest_cache/
+**/.pytest_cache/
 .coverage
+**/.coverage
+coverage.xml
+**/coverage.xml
 htmlcov/
-
-# Artifacts (except examples)
-!test_portfolio.csv
-!Portfolio.csv.example
-
-# Data Storage
-/data/
-!/data/backtest_registry.json
-!investcraft/frontend/src/data/
-
-# Node & Jest Testing Artifacts
-node_modules/
-coverage/
+.tox/
+.mypy_cache/
+.ruff_cache/
 *test_output*.txt
 *test_log*.txt
 *test_failure*.txt
 *test_results*.txt
 *test_errors*.txt
 *loc.txt
+
+# ----- Node / frontend (Vite) -----
+node_modules/
+**/node_modules/
+**/dist/
+**/dist-ssr/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ----- Environment / secrets (never commit) -----
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+credentials.json
+service-account*.json
+secrets.toml
+.streamlit/secrets.toml
+
+# ----- IDE / editor -----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ----- OS -----
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ----- Logs & metrics -----
+logs/
+**/logs/
+*.log
+metrics/
+metrics_*.json
+
+# ----- Generated reports (all nested paths) -----
+reports/**/*.txt
+reports/**/*.html
+reports/**/*.pdf
+reports/**/*.csv
+
+# ----- Uploads (user data) -----
+uploads/*.csv
+
+# ----- Data storage -----
+/data/
+!/data/backtest_registry.json
+!investcraft/frontend/src/data/
+
+# ----- Artifacts (keep examples) -----
+!test_portfolio.csv
+!Portfolio.csv.example
+
+# ----- Docker / local overrides -----
+docker-compose.override.yml
+
+# ----- Cursor / agent local -----
+.cursor/
+!.cursor/rules/

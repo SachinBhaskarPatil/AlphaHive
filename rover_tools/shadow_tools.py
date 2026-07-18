@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import requests
 from datetime import datetime, timedelta
+from config import resolve_ticker
 try:
     from nselib import capital_market, derivatives
 except ImportError:
@@ -26,6 +27,34 @@ except ImportError:
         return decorator
 
 logger = get_logger(__name__)
+
+
+def _close_prices_from_download(data, tickers):
+    """Normalize yf.download output to a DataFrame of close prices (columns = tickers)."""
+    if data is None or (hasattr(data, "empty") and data.empty):
+        return pd.DataFrame()
+
+    close_data = pd.DataFrame()
+    if isinstance(data.columns, pd.MultiIndex):
+        if "Close" in data.columns.get_level_values(0):
+            close_data = data.xs("Close", axis=1, level=0)
+        elif "Close" in data.columns.get_level_values(1):
+            close_data = data.xs("Close", axis=1, level=1)
+        elif "Adj Close" in data.columns.get_level_values(0):
+            close_data = data.xs("Adj Close", axis=1, level=0)
+    elif "Close" in data.columns:
+        close_data = data["Close"]
+        if isinstance(close_data, pd.Series):
+            close_data = close_data.to_frame()
+    else:
+        common = [t for t in tickers if t in data.columns]
+        if common:
+            close_data = data[common]
+
+    if isinstance(close_data, pd.Series):
+        close_data = close_data.to_frame()
+    return close_data
+
 
 # --- 1. THE SPIDER WEB (Sector Rotation) ---
 def analyze_sector_flow():
@@ -51,8 +80,9 @@ def analyze_sector_flow():
     try:
         # Fetch last 30 days of data for all sectors
         tickers = list(sectors.values())
-        data = yf.download(tickers, period="1mo", progress=False)['Close']
-        
+        raw = yf.download(tickers, period="1mo", progress=False, auto_adjust=True)
+        data = _close_prices_from_download(raw, tickers)
+
         if data.empty:
             logger.error("No sector data fetched")
             return pd.DataFrame()
@@ -60,7 +90,7 @@ def analyze_sector_flow():
         for name, ticker in sectors.items():
             if ticker not in data.columns:
                 continue
-                
+
             series = data[ticker].dropna()
             if series.empty:
                 continue
@@ -167,9 +197,10 @@ def detect_silent_accumulation(ticker):
     signals = []
     
     try:
-        ticker = ticker.replace("$", "").strip().upper()
+        ticker = resolve_ticker(ticker.replace("$", "").strip().upper())
         if not ticker.endswith(('.NS', '.BO')) and '^' not in ticker:
              ticker += ".NS"
+        ticker = resolve_ticker(ticker)
         stock = yf.Ticker(ticker)
         hist = stock.history(period="1mo")
         
@@ -220,11 +251,38 @@ def detect_silent_accumulation(ticker):
 
 
 # --- 3.5 SECTOR ACCUMULATION STATS ---
+_SECTOR_ALIASES = {
+    "power": "Energy",
+    "oil gas & consumable fuels": "Energy",
+    "information technology": "IT",
+    "fast moving consumer goods": "FMCG",
+    "fmcg": "FMCG",
+    "automobile and auto components": "Automobile",
+    "metals & mining": "Metals",
+    "construction materials": "Construction Mat",
+    "telecommunication": "Telecom",
+}
+
+
+def _resolve_sector_name(sector_name: str) -> str:
+    if not sector_name:
+        return sector_name
+    trimmed = sector_name.strip()
+    alias = _SECTOR_ALIASES.get(trimmed.lower())
+    return alias or trimmed
+
+
+def list_nifty50_sectors():
+    """Unique sector labels used by NIFTY_50_SECTOR_MAP."""
+    return sorted(set(NIFTY_50_SECTOR_MAP.values()))
+
+
 def get_sector_stocks_accumulation(sector_name):
     """
     Aggregates accumulation scores for all stocks in a sector.
     """
     try:
+        sector_name = _resolve_sector_name(sector_name)
         # Get stocks for sector
         sector_stocks = [t for t, s in NIFTY_50_SECTOR_MAP.items() if s == sector_name]
         
@@ -248,87 +306,126 @@ def get_sector_stocks_accumulation(sector_name):
 
 
 # --- 4. TRAP DETECTOR (FII Sentiment) ---
+def _fetch_fii_derivatives_df(max_lookback_days: int = 14):
+    """Try recent trade dates until nselib returns FII derivatives data."""
+    if derivatives is None:
+        return None, None
+
+    for offset in range(max_lookback_days):
+        trade_date = (datetime.now() - timedelta(days=offset)).strftime("%d-%m-%Y")
+        try:
+            df = derivatives.fii_derivatives_statistics(trade_date=trade_date)
+            if df is not None and not df.empty:
+                return df, trade_date
+        except Exception as e:
+            err = str(e).lower()
+            if "xlrd" in err:
+                logger.error("FII fetch needs xlrd: pip install xlrd>=2.0.1")
+                return None, None
+            continue
+
+    return None, None
+
+
+def _fii_long_pct_from_df(df: pd.DataFrame) -> float | None:
+    """Parse nselib FII derivatives table (legacy and current column layouts)."""
+    if df is None or df.empty:
+        return None
+
+    work = df.copy()
+    work.columns = [str(c).strip() for c in work.columns]
+
+    # Current nselib (2025+): fii_derivatives, buy_contracts, sell_contracts
+    if "fii_derivatives" in work.columns and "buy_contracts" in work.columns:
+        label_col = "fii_derivatives"
+        buy_col, sell_col = "buy_contracts", "sell_contracts"
+        idx_rows = work[work[label_col].astype(str).str.contains("NIFTY FUTURES", case=False, na=False)]
+        if idx_rows.empty:
+            idx_rows = work[work[label_col].astype(str).str.contains("INDEX FUTURES", case=False, na=False)]
+        if idx_rows.empty:
+            idx_rows = work[work[label_col].astype(str).str.endswith("FUTURES", na=False)].head(1)
+        if idx_rows.empty:
+            return None
+        row = idx_rows.iloc[0]
+        buy = float(row[buy_col] or 0)
+        sell = float(row[sell_col] or 0)
+        total = buy + sell
+        return round((buy / total) * 100, 1) if total > 0 else None
+
+    # Legacy nselib layout
+    if "Date" not in work.columns:
+        for c in work.columns:
+            if "date" in c.lower():
+                work.rename(columns={c: "Date"}, inplace=True)
+                break
+
+    if "Date" not in work.columns or "Instrument Type" not in work.columns:
+        return None
+
+    latest_date = work["Date"].iloc[-1]
+    day_data = work[work["Date"] == latest_date]
+    idx_fut = day_data[day_data["Instrument Type"].astype(str).str.contains("Index Futures", case=False, na=False)]
+    if idx_fut.empty:
+        return None
+    row = idx_fut.iloc[0]
+    buy_col = next((c for c in work.columns if "Buy" in c and "Contract" in c), None)
+    sell_col = next((c for c in work.columns if "Sell" in c and "Contract" in c), None)
+    if not buy_col or not sell_col:
+        return None
+    buy = float(str(row[buy_col]).replace(",", "") or 0)
+    sell = float(str(row[sell_col]).replace(",", "") or 0)
+    total = buy + sell
+    return round((buy / total) * 100, 1) if total > 0 else None
+
+
 def get_trap_indicator():
     """
     Returns FII Sentiment Status based on Index Futures using nselib.
     """
     try:
         if derivatives is None:
-             return {"status": "Unknown", "fii_long_pct": 50, "message": "nselib not available"}
-        # Fetch FII derivatives stats (nselib requires explicit date sometimes)
-        today_str = datetime.now().strftime("%d-%m-%Y")
-        # If it fails for today (holiday/market closed), nselib might error or return empty
-        # Ideally we loop back a few days, but let's try today first
-        try:
-             df = derivatives.fii_derivatives_statistics(trade_date=today_str)
-        except:
-             # Fallback to yesterday if today fails (rudimentary retry)
-             yesterday = (datetime.now() - timedelta(days=1)).strftime("%d-%m-%Y")
-             df = derivatives.fii_derivatives_statistics(trade_date=yesterday)
-        if df.empty:
-             return {"status": "Unknown", "fii_long_pct": 50, "message": "Data Unavailable"}
-             
-        # Normalize columns (Date, Instrument Type, ... Number of Contracts Buy, Number of Contracts Sell)
-        df = df.reset_index() # Ensure Date is available as column if it became index
-        # We need 'Index Futures' row for the latest date
-        if 'Date' not in df.columns:
-             # Try finding a column that looks like date or lowercase
-             for c in df.columns:
-                 if 'date' in c.lower():
-                     df.rename(columns={c: 'Date'}, inplace=True)
-                     break
-        
-        if 'Date' not in df.columns:
-             return {"status": "Unknown", "fii_long_pct": 50, "message": "Date column missing in FII data"}
+            return {
+                "status": "Unknown",
+                "fii_long_pct": 50,
+                "message": "nselib not installed — FII trap detector unavailable in this environment.",
+            }
 
-        latest_date = df['Date'].iloc[-1]
-        day_data = df[df['Date'] == latest_date]
-        
-        idx_fut = day_data[day_data['Instrument Type'].str.contains('Index Futures', case=False, na=False)]
-        
-        if idx_fut.empty:
-             return {"status": "Neutral", "fii_long_pct": 50, "message": "No Index Futures Data"}
-             
-        idx_fut = idx_fut.iloc[0]
-        
-        # Extract values
-        longs = float(str(idx_fut.get('Buy High', 0) if 'Buy High' in idx_fut else idx_fut.iloc[2]).replace(',', '')) # Fallback logic dependent on dataframe structure
-        # Actually nselib returns specific columns. Let's rely on inspection logic or broad try/catch
-        # Usually: "Buy Contract" vs "Sell Contract"
-        # Since column names vary, we'll try standard keys
-        
-        # RE-FETCH with specific known method if possible or parse current df carefully
-        # The dataframe usually has: ['Date', 'Instrument Type', 'Number of Contracts (Buy)', 'Number of Contracts (Sell)', ...]
-        
-        # Let's trust pandas structure from typical nselib output
-        # Col 3 is Buy Contracts, Col 5 is Sell Contracts (0-indexed: 2, 4) if verifying locally
-        # Better: use header matching
-        buy_col = [c for c in df.columns if 'Buy' in c and 'Contract' in c][0]
-        sell_col = [c for c in df.columns if 'Sell' in c and 'Contract' in c][0]
-        
-        long_contracts = float(str(idx_fut[buy_col]).replace(',', ''))
-        sell_contracts = float(str(idx_fut[sell_col]).replace(',', ''))
-        
-        total = long_contracts + sell_contracts
-        long_pct = round((long_contracts / total) * 100, 1)
-        
+        df, trade_date = _fetch_fii_derivatives_df()
+        if df is None or df.empty:
+            return {
+                "status": "Unknown",
+                "fii_long_pct": 50,
+                "message": (
+                    "FII data unavailable. Install xlrd (pip install xlrd>=2.0.1), "
+                    "or try again on a trading day if NSE is down."
+                ),
+            }
+
+        long_pct = _fii_long_pct_from_df(df)
+        if long_pct is None:
+            return {
+                "status": "Unknown",
+                "fii_long_pct": 50,
+                "message": "FII feed returned an unexpected format from NSE.",
+            }
+
         status = "Neutral"
-        msg = f"FIIs have {long_pct}% Long Exposure."
-        
+        msg = f"FIIs have {long_pct}% long exposure on Nifty futures (as of {trade_date})."
+
         if long_pct > 70:
             status = "Euphoria"
-            msg += " **Risk of Bull Trap!**"
+            msg += " Risk of bull trap."
         elif long_pct < 30:
             status = "Panic"
-            msg += " **Risk of Bear Trap!** (Reversal Possible)"
+            msg += " Risk of bear trap (reversal possible)."
         else:
-            status = "Neutral"
             msg += " Balanced positioning."
-            
+
         return {
             "status": status,
-            "fii_long_pct": long_pct, 
-            "message": msg
+            "fii_long_pct": long_pct,
+            "trade_date": trade_date,
+            "message": msg,
         }
 
     except Exception as e:
@@ -336,8 +433,11 @@ def get_trap_indicator():
         logger.error(f"Trap Detector Failed: {traceback.format_exc()}")
         return {
             "status": "Error",
-            "fii_long_pct": 50, 
-            "message": f"Could not fetch FII Data: {str(e)[:100]}"
+            "fii_long_pct": 50,
+            "message": (
+                "Could not fetch FII data from NSE. "
+                "This often happens on weekends/holidays or when the NSE feed is down."
+            ),
         }
 
 # ==============================================================================

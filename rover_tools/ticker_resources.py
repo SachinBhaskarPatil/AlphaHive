@@ -104,7 +104,7 @@ BANK_NIFTY = [
 ]
 
 POPULAR_OTHERS = [
-    "ZOMATO.NS - Zomato Limited",
+    "ETERNAL.NS - Eternal Limited",
     "PAYTM.NS - One97 Communications Ltd",
     "NYKAA.NS - FSN E-Commerce Ventures Ltd",
     "POLICYBZR.NS - PB Fintech Ltd",
@@ -179,6 +179,11 @@ NIFTY_SMALLCAP = [
     "TRIDENT.NS - Trident Ltd"
 ]
 
+def parse_ticker_entry(entry: str) -> str:
+    """Return symbol from 'TICKER.NS - Company Name' list entries."""
+    return entry.split(" - ")[0].strip()
+
+
 # Helper to get categorized tickers
 def get_common_tickers(category="All"):
     """
@@ -202,7 +207,8 @@ def get_ticker_name(symbol):
     """
     Returns the company name for a given ticker symbol.
     """
-    symbol = symbol.strip().upper()
+    from config import resolve_ticker
+    symbol = resolve_ticker(symbol.strip().upper())
     if not symbol.endswith(".NS") and not symbol.endswith(".BO"):
          # Try appending .NS
          candidates = [symbol, f"{symbol}.NS"]
@@ -232,7 +238,7 @@ NIFTY_NEXT_50 = [
     "BEL.NS - Bharat Electronics Ltd",
     "HAL.NS - Hindustan Aeronautics Ltd",
     "TRENT.NS - Trent Ltd",
-    "ZOMATO.NS - Zomato Limited",
+    "ETERNAL.NS - Eternal Limited",
     "DLF.NS - DLF Ltd",
     "SIEMENS.NS - Siemens Ltd",
     "VBL.NS - Varun Beverages Ltd",
@@ -264,7 +270,7 @@ NIFTY_NEXT_50 = [
 # --- Sector Mapping for Next 50 ---
 NIFTY_NEXT_50_SECTOR_MAP = {
     "BEL.NS": "Defence/Ind", "HAL.NS": "Defence/Ind", "SIEMENS.NS": "Defence/Ind", "ABB.NS": "Defence/Ind",
-    "TRENT.NS": "Consumer Dist", "ZOMATO.NS": "Consumer Dist", "VBL.NS": "Consumer Goods", "DABUR.NS": "Consumer Goods",
+    "TRENT.NS": "Consumer Dist", "ETERNAL.NS": "Consumer Dist", "VBL.NS": "Consumer Goods", "DABUR.NS": "Consumer Goods",
     "GODREJCP.NS": "Consumer Goods", "MARICO.NS": "Consumer Goods", "BERGEPAINT.NS": "Consumer Goods",
     "PIDILITIND.NS": "Chemicals", "PIIND.NS": "Chemicals",
     "DLF.NS": "Real Estate", "AMBUJACEM.NS": "Construction Mat", "SHREECEM.NS": "Construction Mat",
@@ -379,6 +385,26 @@ ASSET_PROXIES = {
 
 # --- NEW: Brand Metadata (Colors & Names) for Visual UI ---
 # Extracted from assets/Nifty50.html
+
+def brand_icon_data_url(ticker: str, color: str = "#334155") -> str:
+    """Colored ticker badge as a base64 SVG data URL (used by the Brand Shop)."""
+    import base64
+
+    tick_short = ticker.split(".")[0]
+    if len(tick_short) > 6:
+        tick_short = tick_short[:5]
+    text_color = "#000000" if color in ("#FFD200", "#FFF200") else "#ffffff"
+    font_size = 9 if len(tick_short) <= 5 else 7
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">'
+        f'<rect width="32" height="32" rx="8" fill="{color}"/>'
+        f'<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" '
+        f'fill="{text_color}" font-family="Arial" font-weight="bold" font-size="{font_size}">'
+        f'{tick_short}</text></svg>'
+    )
+    return f"data:image/svg+xml;base64,{base64.b64encode(svg.encode('utf-8')).decode('utf-8')}"
+
+
 NIFTY_50_BRAND_META = {
     "ADANIENT.NS": {"name": "Adani Enterprises", "color": "#0054A6"},
     "ADANIPORTS.NS": {"name": "Adani Ports & SEZ", "color": "#0054A6"},
@@ -431,3 +457,60 @@ NIFTY_50_BRAND_META = {
     "ULTRACEMCO.NS": {"name": "UltraTech Cement", "color": "#FFD200"},
     "WIPRO.NS": {"name": "Wipro", "color": "#20348C"}
 }
+
+# Distinct badge colors for indices beyond Nifty 50 (when not in NIFTY_50_BRAND_META).
+BRAND_COLOR_PALETTE = [
+    "#0054A6", "#1C3E94", "#007CC3", "#E21D26", "#6A2D91", "#008066",
+    "#F6821F", "#0e7490", "#971237", "#E23744", "#004B8D", "#E31837",
+    "#00539C", "#D32F2F", "#00A5E3", "#B2955A", "#2D2926", "#FFD200",
+    "#007A33", "#20348C", "#009999", "#F26522", "#A02030", "#0080C0",
+]
+
+TICKER_COLOR_OVERRIDES = {
+    "ETERNAL.NS": "#E23744",
+    "ZOMATO.NS": "#E23744",
+    "DLF.NS": "#0054A6",
+    "HAL.NS": "#0054A6",
+    "INDIGO.NS": "#00008B",
+    "ABB.NS": "#FF0000",
+    "SIEMENS.NS": "#009999",
+    "BANKBARODA.NS": "#F26522",
+    "PNB.NS": "#A02030",
+    "CANBK.NS": "#0080C0",
+    "VEDL.NS": "#F6821F",
+    "IOC.NS": "#F6821F",
+    "GAIL.NS": "#0072BC",
+    "PIDILITIND.NS": "#0054A6",
+    "AMBUJACEM.NS": "#0054A6",
+    "BERGEPAINT.NS": "#0054A6",
+    "DABUR.NS": "#008066",
+    "GODREJCP.NS": "#008066",
+    "MARICO.NS": "#008066",
+    "HAVELLS.NS": "#E21D26",
+    "TVSMOTOR.NS": "#00428A",
+    "CHOLAFIN.NS": "#0072BB",
+    "SBICARD.NS": "#00A5E3",
+    "ICICIGI.NS": "#052F5F",
+    "ICICIPRULI.NS": "#052F5F",
+    "PIIND.NS": "#6A2D91",
+    "SHREECEM.NS": "#FFD200",
+    "VBL.NS": "#004B8D",
+}
+
+
+def get_brand_meta(ticker: str, category: str = "Nifty 50", sector: str | None = None) -> dict:
+    """Name + color for brand-shop icons across Nifty 50 / Next 50 / Midcap."""
+    _ = category, sector  # reserved for future category-specific styling
+    t = ticker.strip().upper()
+    if not t.endswith((".NS", ".BO")):
+        t = f"{t}.NS"
+
+    if t in NIFTY_50_BRAND_META:
+        return dict(NIFTY_50_BRAND_META[t])
+
+    name = get_ticker_name(t)
+    if t in TICKER_COLOR_OVERRIDES:
+        return {"name": name, "color": TICKER_COLOR_OVERRIDES[t]}
+
+    color = BRAND_COLOR_PALETTE[sum(ord(c) for c in t) % len(BRAND_COLOR_PALETTE)]
+    return {"name": name, "color": color}

@@ -1,17 +1,16 @@
-# Market-Rover Streamlit & CrewAI Dependencies
-# (Strictly isolated from Pledge Rover & InvestBrand APIs)
+# Market-Rover Shared Library & CrewAI Dependencies
+# (Used by the FastAPI backend agent nodes and the automation scripts.
+#  Strictly isolated from Pledge Rover & InvestBrand APIs)
 
 # Core App & AI Agents
 crewai>=1.7.2
 crewai-tools>=1.7.2
 langgraph~=1.1.4
+openai>=1.60.0
 google-genai>=1.56.0
 langchain-google-genai~=4.2.0
 
-# Frontend UI
-streamlit>=1.52.0
-streamlit-authenticator>=0.4.2
-streamlit-oauth>=0.1.11
+# Visualization & Reporting (market snapshots, dashboards, PDF/PNG export)
 plotly>=6.5.0
 matplotlib>=3.10.8
 seaborn>=0.13.2
@@ -23,6 +22,7 @@ numpy>=2.1.1
 scipy>=1.15.2
 yfinance>=0.2.66
 nselib>=1.9
+xlrd>=2.0.1
 nsepython>=2.97
 beautifulsoup4~=4.13.4
 newspaper3k>=0.2.8

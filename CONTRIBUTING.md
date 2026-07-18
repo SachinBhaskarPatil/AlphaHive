@@ -31,7 +31,7 @@ We strict separation to keep production fast and Linux-compatible.
 
 ### 1. Production (`requirements.txt`)
 **Rule:** Only libraries that are *imported* by the app.
-**Examples:** `streamlit`, `pandas`, `crewai`.
+**Examples:** `fastapi`, `pandas`, `crewai`.
 
 ### 2. Development (`requirements-dev.txt`)
 **Rule:** Tools for testing/safety only.

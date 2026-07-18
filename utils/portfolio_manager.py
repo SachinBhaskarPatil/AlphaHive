@@ -1,10 +1,14 @@
 import json
 import os
+from pathlib import Path
+
 import pandas as pd
 from utils.logger import logger
 import config
 
-DATA_FILE = "data/saved_portfolios.json"
+# Always resolve against repo root — API may run with backend/ as cwd.
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+DATA_FILE = str(_REPO_ROOT / "data" / "saved_portfolios.json")
 
 class PortfolioManager:
     """
@@ -74,9 +78,10 @@ class PortfolioManager:
 
         user_portfolios = self.data["users"][self.username]["portfolios"]
 
-        # Check storage limit
-        if name not in user_portfolios and len(user_portfolios) >= config.MAX_PORTFOLIOS_PER_USER:
-            return False, f"Storage limit reached (Max {config.MAX_PORTFOLIOS_PER_USER} portfolios). Delete one to save new."
+        # Check storage limit (0 = unlimited)
+        limit = config.MAX_PORTFOLIOS_PER_USER
+        if limit > 0 and name not in user_portfolios and len(user_portfolios) >= limit:
+            return False, f"Storage limit reached (Max {limit} portfolios). Delete one to save new."
 
         # Convert to records for storage
         user_portfolios[name] = df.to_dict('records')

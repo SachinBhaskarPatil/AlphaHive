@@ -7,9 +7,9 @@ import io
 import warnings
 from PIL import Image
 
-# === MONKEY PATCH FOR STREAMLIT/PYDANTIC CONFLICT ===
+# === MONKEY PATCH FOR MATPLOTLIB/PYDANTIC WARNINGS CONFLICT ===
 # Matplotlib 3.8+ passes 'skip_file_prefixes' to warnings.warn, which
-# Pydantic's filtered_warn (used by Streamlit) doesn't accept.
+# Pydantic's filtered_warn doesn't accept.
 _original_warn = warnings.warn
 def _patched_warn(message, category=None, stacklevel=1, source=None, **kwargs):
     kwargs.pop('skip_file_prefixes', None)

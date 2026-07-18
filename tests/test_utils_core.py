@@ -118,12 +118,13 @@ def test_user_profile_lifecycle(clean_user_env):
     assert not status['exists']
     assert status['needs_update']
     
-    # Create Profile
+    # Create Profile (quiz only — onboarding not finished yet)
     um.save_user_profile(
         username, 
         "The Compounder", 
         {"q1": 1}, 
-        ["AAPL"]
+        ["AAPL"],
+        onboarding_complete=False,
     )
     
     # Verify contents
@@ -131,11 +132,17 @@ def test_user_profile_lifecycle(clean_user_env):
     assert profile['persona'] == "The Compounder"
     assert profile['brands'] == ["AAPL"]
     
-    # Verify status
+    # Quiz saved but full onboarding incomplete
     status = um.get_profile_status(username)
     assert status['exists']
     assert status['days_old'] == 0
+    assert status['needs_update']
+    assert not status['onboarding_complete']
+
+    um.mark_onboarding_complete(username)
+    status = um.get_profile_status(username)
     assert not status['needs_update']
+    assert status['onboarding_complete']
     
 def test_user_profile_expiry(clean_user_env):
     um = UserProfileManager()
@@ -174,6 +181,8 @@ def test_sanitize_ticker():
     
     # Cleaning
     assert sanitize_ticker("  tcs.ns  ") == "TCS.NS"
+    assert sanitize_ticker("ZOMATO.NS") == "ETERNAL.NS"
+    assert sanitize_ticker("zomato") == "ETERNAL"
     
     # Invalid
     assert sanitize_ticker(None) is None

@@ -1,10 +1,12 @@
 import yfinance as yf
 import pandas as pd
-import streamlit as st
 import datetime
+import logging
 from rover_tools.ticker_resources import get_common_tickers
 
-# @st.cache_data(ttl=3600*24) # Cache for 24 hours as historical data for past years won't change
+logger = logging.getLogger(__name__)
+
+
 def calculate_seasonality_win_rate(category="Nifty 50", target_month=None, period="10y", top_n=5, exclude_outliers=False):
     """
     Calculates the historical win rate for the specified month and category.
@@ -34,7 +36,7 @@ def calculate_seasonality_win_rate(category="Nifty 50", target_month=None, perio
     try:
         data = yf.download(yf_tickers, period=period, interval="1mo", progress=False)['Close']
     except Exception as e:
-        st.error(f"Failed to fetch seasonality data: {e}")
+        logger.error(f"Failed to fetch seasonality data: {e}")
         return []
     
     results = []
@@ -112,7 +114,6 @@ def calculate_seasonality_win_rate(category="Nifty 50", target_month=None, perio
         
     return final_list
 
-# @st.cache_data(ttl=3600*24)
 def get_performance_stars(category="Nifty 50", period="1y", top_n=5):
     """
     Calculates top performing stocks (Stars) based on absolute return over a period.

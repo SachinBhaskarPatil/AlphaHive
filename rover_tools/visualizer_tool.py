@@ -8,11 +8,9 @@ from typing import Type
 from pydantic import BaseModel, Field
 from utils.logger import get_logger
 from utils.metrics import track_error_detail
-import streamlit as st
 
 logger = get_logger(__name__)
 
-# @st.cache_data(ttl=300, show_spinner=False)
 def run_snapshot_logic(ticker: str):
     """
     Cached worker function for market snapshot analysis.

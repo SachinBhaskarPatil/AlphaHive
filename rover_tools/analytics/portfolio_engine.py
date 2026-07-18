@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import yfinance as yf
+from config import resolve_ticker
 from rover_tools.ticker_resources import get_ticker_name
 
 class AnalyticsPortfolio:
@@ -12,6 +13,7 @@ class AnalyticsPortfolio:
             return pd.DataFrame()
             
         try:
+            tickers = [resolve_ticker(t) for t in tickers]
             # Force structure to avoid ambiguity
             # Note: auto_adjust=True is new default.
             data = yf.download(tickers, period=period, progress=False)
@@ -121,7 +123,9 @@ class AnalyticsPortfolio:
         
         vols = {}
         means = {} # For growth mode
-        tickers = df['symbol'].tolist()
+        tickers = [resolve_ticker(t) for t in df['symbol'].tolist()]
+        df = df.copy()
+        df['symbol'] = tickers
         
         warnings = []
         
@@ -253,9 +257,10 @@ class AnalyticsPortfolio:
         """
         try:
             # Sanitize
-            ticker = ticker.replace("$", "").strip().upper()
+            ticker = resolve_ticker(ticker.replace("$", "").strip().upper())
             if not ticker.endswith(('.NS', '.BO')) and 'NIFTY' not in ticker and 'SENSEX' not in ticker and '^' not in ticker:
                  ticker += ".NS"
+            ticker = resolve_ticker(ticker)
 
             hist = yf.Ticker(ticker).history(period=period)
             if hist.empty:

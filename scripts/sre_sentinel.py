@@ -19,10 +19,10 @@ def run_sre_sentinel():
 
     if mock_latency > 2.0:
         print("BOTTLENECK DETECTED: Latency > 2.0s")
-        remediation = propose_system_remediation(
+        remediation = propose_system_remediation.run(
             issue_description=f"Persistent latency spike of {mock_latency}s detected in 'News Scraper' module.",
             suggested_fix="Enable Parallel Scrape Mode and Scale Cloud Run minimum instances from 0 to 1.",
-            risk_level="High / Stability Critical"
+            risk_level="High / Stability Critical",
         )
         print(f"ACTION: {remediation}")
     else:

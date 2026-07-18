@@ -1,0 +1,56 @@
+# AlphaHive / Market-Rover Backend — Python Dependencies
+# Install from repo root: pip install -r market_rover/backend/requirements.txt
+# Also requires repo-root packages from ../../requirements.txt for full agent tooling.
+
+# --- Web Framework ---
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+
+# --- Data Models ---
+pydantic>=2.11.9,<3
+
+# --- Database ---
+asyncpg>=0.30.0
+
+# --- LangGraph + OpenAI Agents ---
+langgraph>=1.0.0
+openai>=1.60.0
+crewai
+crewai[tools]
+
+# --- HTTP Client (OAuth callbacks, shadow tools) ---
+httpx>=0.28.0
+requests>=2.32.3
+aiohttp>=3.11.0
+
+# --- Market Data & Analytics ---
+yfinance>=0.2.54
+pandas>=2.2.0
+numpy>=2.1.1
+scipy>=1.15.2
+nselib>=1.9
+nsepython>=2.97
+xlrd>=2.0.1
+
+# --- Visualization & Report Export ---
+plotly>=6.5.0
+matplotlib>=3.10.8
+seaborn>=0.13.2
+Pillow>=11.3.0
+
+# --- News / Search (sentiment & retrieval agents) ---
+beautifulsoup4>=4.13.4
+newspaper3k>=0.2.8
+lxml_html_clean>=0.4.3
+duckduckgo_search>=8.1.1
+
+# --- Utilities ---
+python-dotenv>=1.1.0
+PyYAML>=6.0.1
+
+# --- Security ---
+pyjwt>=2.8.0
+
+# --- Testing (not installed in production image, but listed for CI) ---
+# pytest>=8.0.0
+# pytest-asyncio>=0.26.0

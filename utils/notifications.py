@@ -9,33 +9,19 @@ from email.mime.multipart import MIMEMultipart
 import logging
 import os
 
-try:
-    import streamlit as st
-except ImportError:
-    st = None
-
 logger = logging.getLogger(__name__)
 
 class EmailManager:
     """
     Manages email notifications using SMTP.
-    Requires [email] section in .streamlit/secrets.toml or Environment Variables.
+    Requires SMTP settings supplied via Environment Variables.
     """
     def __init__(self):
         self._config = self._load_config()
         
     def _load_config(self):
-        """Load email config from Streamlit secrets or Environment Variables."""
-        
-        # 1. Try Streamlit Secrets (for Streamlit app)
-        if st is not None:
-            try:
-                if "email" in st.secrets:
-                    return st.secrets.get("email", {})
-            except Exception:
-                pass
+        """Load email config from Environment Variables."""
 
-        # 2. Try Environment Variables (for GitHub Actions / Headless run)
         env_config = {
             "smtp_server": os.environ.get("SMTP_SERVER"),
             "smtp_port": os.environ.get("SMTP_PORT", 587),
@@ -52,7 +38,7 @@ class EmailManager:
                 env_config["smtp_port"] = 587
             return env_config
 
-        logger.warning("No Streamlit secrets or Env vars for email found. Email disabled.")
+        logger.warning("No Env vars for email found. Email disabled.")
         return {}
 
     def is_configured(self):

@@ -94,7 +94,6 @@ jobs:
       run: |
         echo "Checking project structure..."
         test -f main.py && echo "[OK] main.py exists" || true
-        test -f app.py && echo "[OK] app.py exists" || true
         test -f crew_engine.py && echo "[OK] crew_engine.py exists" || true
         test -f config.py && echo "[OK] config.py exists" || true
         test -d utils && echo "[OK] utils/ directory exists" || true

@@ -1,10 +1,10 @@
 ---
-description: Pre-flight checklist and command flow for deploying to Streamlit Cloud
+description: Pre-flight checklist and command flow for deploying to Google Cloud Run
 ---
 
 # Deployment Workflow
 
-Streamlit Cloud deploys automatically on push. This workflow ensures that push is safe.
+Google Cloud Run auto-deploys via GitHub Actions (`.github/workflows/market_rover_deploy.yml`) when changes are pushed to `main`. The workflow runs backend tests, builds images via Cloud Build, and deploys the `market-rover-api` and `market-rover-ui` services. This checklist ensures that push is safe.
 
 1.  **⏱️ Start Timer**
     - [ ] Run: `python -m utils.tracking start deployment`
@@ -49,7 +49,8 @@ Streamlit Cloud deploys automatically on push. This workflow ensures that push i
     - *Metric*: Run: `python -m utils.tracking event emergency_override "Reason for hotfix"`
 
 8.  **Post-Deploy Verification**
-    - [ ] Open https://market-rover.streamlit.app/
+    - [ ] Check the GitHub Actions run for `market_rover_deploy.yml` completed green.
+    - [ ] Open https://market-rover-ui-9514347926.us-central1.run.app/
     - [ ] Verify the app loads.
 
 9.  **🏁 Stop Timer**

@@ -7,6 +7,23 @@ from pathlib import Path
 DATA_DIR = Path(__file__).parent.parent / "data"
 FORECAST_FILE = DATA_DIR / "forecast_history.json"
 
+def _ticker_key(ticker: str) -> str:
+    return str(ticker or "").strip().upper()
+
+
+def _dedupe_latest(records: list) -> list:
+    """Keep the newest forecast per ticker."""
+    by_ticker: dict[str, dict] = {}
+    for row in records:
+        key = _ticker_key(row.get("ticker"))
+        if not key:
+            continue
+        prev = by_ticker.get(key)
+        if not prev or str(row.get("timestamp", "")) >= str(prev.get("timestamp", "")):
+            by_ticker[key] = row
+    return sorted(by_ticker.values(), key=lambda x: str(x.get("timestamp", "")), reverse=True)
+
+
 def _load_db():
     """
     Loads the database, handling migration from legacy list format to user-dict format.
@@ -65,16 +82,27 @@ def save_forecast(ticker, current_price, target_price, target_date, strategy_nam
         
     if username not in db["users"]:
         db["users"][username] = []
-        
-    db["users"][username].append(record)
+
+    history = db["users"][username]
+    ticker_key = _ticker_key(ticker)
+    history = [h for h in history if _ticker_key(h.get("ticker")) != ticker_key]
+    history.append(record)
+    db["users"][username] = history
     
     _save_db(db)
     return True
 
-def get_forecast_history(username="guest"):
-    """Retrieve all saved forecasts for a specific user."""
+def get_forecast_history(username="guest", unique=True):
+    """Retrieve saved forecasts for a user (newest per ticker by default)."""
     db = _load_db()
-    return db.get("users", {}).get(username, [])
+    records = db.get("users", {}).get(username, [])
+    if unique:
+        deduped = _dedupe_latest(records)
+        if len(deduped) < len(records):
+            db["users"][username] = deduped
+            _save_db(db)
+        return deduped
+    return sorted(records, key=lambda x: str(x.get("timestamp", "")), reverse=True)
 
 def delete_forecasts(timestamps_to_delete, username="guest"):
     """
@@ -93,8 +121,9 @@ def delete_forecasts(timestamps_to_delete, username="guest"):
         history = users[username]
         initial_len = len(history)
         
-        # Filter out the items to delete
-        new_history = [h for h in history if h['timestamp'] not in timestamps_to_delete]
+        # Filter out the items to delete (match by timestamp; tolerate duplicate tickers)
+        ts_set = set(timestamps_to_delete)
+        new_history = [h for h in history if h.get("timestamp") not in ts_set]
         
         if len(new_history) == initial_len:
             return False # Nothing deleted

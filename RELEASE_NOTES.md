@@ -72,12 +72,12 @@
 
 ## 📦 Deployment
 
-This version is ready for **Streamlit Community Cloud**.
+This version deploys to **Google Cloud Run** via **GitHub Actions**.
 
 **Deployment Steps:**
-1.  Push `main` branch to GitHub.
-2.  Deploy via [share.streamlit.io](https://share.streamlit.io).
-3.  Set `GOOGLE_API_KEY` in Secrets.
+1.  Push the `main` branch to GitHub.
+2.  The `.github/workflows/market_rover_deploy.yml` workflow runs tests, builds images, and deploys the `market-rover-api` and `market-rover-ui` Cloud Run services.
+3.  Ensure the required GitHub secrets (e.g. `GCP_SA_KEY`, `GOOGLE_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `JWT_SECRET`) are configured.
 
 *(See `DEPLOYMENT.md` for full guide)*
 

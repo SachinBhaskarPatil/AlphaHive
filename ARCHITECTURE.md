@@ -6,7 +6,7 @@ This document details the internal architecture of Market-Rover, focusing on its
 
 ## 1. High-Level Component Diagram
 
-This diagram illustrates the separation of concerns between the compiled Python runtime (Streamlit), the Agentic Core, and external data sources.
+This diagram illustrates the separation of concerns between the React + Vite frontend, the FastAPI backend and Agentic Core, and external data sources.
 
 ```mermaid
 graph TB
@@ -19,9 +19,9 @@ graph TB
 
     subgraph UserLayer [User Interface Layer]
         direction TB
-        UI[Streamlit App\n(app.py)]:::frontend
-        Tabs[UI Tabs\n(tabs/*)]:::frontend
-        UI --> Tabs
+        UI[React + Vite Frontend\n(market_rover/frontend)]:::frontend
+        API[FastAPI Backend\n(market_rover/backend)]:::frontend
+        UI --> API
     end
 
     subgraph LogicLayer [Agentic Core Layer]
@@ -56,8 +56,8 @@ graph TB
     end
 
     %% Connections
-    UI -- "1. Trigger Analysis" --> CrewEngine
-    Tabs -- "Read Reports" --> Reports
+    API -- "1. Trigger Analysis" --> CrewEngine
+    API -- "Read Reports" --> Reports
     
     CrewEngine -- "2. Orchestrate" --> Tools
     Agents -- "Uses" --> Tools
@@ -127,7 +127,7 @@ flowchart TD
     
     Save[Save Report to /reports]
     Parse[Parse JSON Output]
-    Display[Render Streamlit UI]
+    Display[Render React UI]
     End((End))
 
     %% Edge

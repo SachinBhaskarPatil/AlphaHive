@@ -99,7 +99,7 @@
 | **yfinance (Yahoo)** | Unlimited (free) | $0 | ✅ Free |
 | **NSE Option Chain** | ~10 calls/day | $0 | ✅ Free |
 | **Newspaper3k** | ~20 articles/analysis | $0 | ✅ Free |
-| **Streamlit Hosting** | Community Cloud | $0 | ✅ Free |
+| **Cloud Run Hosting** | Google Cloud | $0 | ✅ Free |
 
 **Total Estimated Cost:** **$0-5/month** (well within Gemini free tier)
 
@@ -263,7 +263,7 @@ def handle_error(error: Exception) -> dict:
 
 ### ✅ **Security Status**
 
-1. ✅ **Secrets Management** - API keys in Streamlit secrets
+1. ✅ **Secrets Management** - API keys in environment variables / Cloud Run secrets
 2. ✅ **No Hardcoded Credentials** - All sensitive data in secrets.toml
 3. ✅ **Input Validation** - Ticker uppercase, sanitization
 4. ✅ **File Type Validation** - Only CSV accepted for portfolio
@@ -277,25 +277,29 @@ def handle_error(error: Exception) -> dict:
 ```python
 # Priority Security Fixes:
 
-# 1. Add rate limiting
-from streamlit_extras.stateful_button import stateful_button
+# 1. Add rate limiting (backend, per-client window)
 import time
 
-if 'last_analysis_time' not in st.session_state:
-    st.session_state.last_analysis_time = 0
+_last_analysis: dict[str, float] = {}
 
-if time.time() - st.session_state.last_analysis_time < 30:
-    st.warning("⏳ Please wait 30 seconds between analyses")
-    return
+def check_rate_limit(client_id: str, window: int = 30) -> bool:
+    now = time.time()
+    if now - _last_analysis.get(client_id, 0) < window:
+        return False  # too soon -> reject with HTTP 429
+    _last_analysis[client_id] = now
+    return True
 
 # 2. Sanitize LLM inputs
 def sanitize_ticker(ticker: str) -> str:
     """Remove dangerous characters"""
     return ''.join(c for c in ticker if c.isalnum() or c == '.')[:10]
 
-# 3. Add file size check
-if uploaded_file.size > 5 * 1024 * 1024:  # 5MB
-    st.error("File too large. Max 5MB.")
+# 3. Add upload size check
+MAX_UPLOAD_BYTES = 5 * 1024 * 1024  # 5MB
+
+def validate_upload_size(size: int) -> None:
+    if size > MAX_UPLOAD_BYTES:
+        raise ValueError("File too large. Max 5MB.")
 ```
 
 ---

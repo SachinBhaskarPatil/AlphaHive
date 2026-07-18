@@ -1,3 +1,7 @@
-Symbol,Company Name,Quantity,Average Price
-RELIANCE.NS,Reliance,10,2500
-TCS.NS,TCS,5,3500
+Symbol,Asset Class,Weight (%),Strategy,Company Name,Quantity,Average Price
+AMBUJACEM.NS,Equity_Core,16.67,User Choice (Core),Ambuja Cements Ltd,10,0.0
+EICHERMOT.NS,Equity_Core,16.67,User Choice (Core),Eicher Motors,10,0.0
+INFY.NS,Equity_Core,16.67,User Choice (Core),Infosys,10,0.0
+COALINDIA.NS,Equity_Core,16.67,User Choice (Core),Coal India,10,0.0
+ITC.NS,Equity_Core,16.67,User Choice (Core),ITC Ltd,10,0.0
+HEROMOTOCO.NS,,,,Hero MotoCorp,10,0.0

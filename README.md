@@ -58,11 +58,11 @@ Market-Rover is an AI-powered platform with a **comprehensive suite of intellige
 |---------|-------------|-----------------|
 | **📤 Portfolio Analysis** | AI-driven multi-stock analysis with news & sentiment | CrewAI, Gemini, Parallel Processing |
 | **📈 Market Visualizer** | High-fidelity dashboards & Monthly Heatmaps | Plotly, PNG export, IQR Filtering |
-| **📊 Benchmark Analysis** | Benchmark Deep-dives (Nifty, Sensex, Bank Nifty) | Shared Analysis pipe, st.pills |
+| **📊 Benchmark Analysis** | Benchmark Deep-dives (Nifty, Sensex, Bank Nifty) | Shared Analysis pipe, React filter chips |
 | **🧩 InvestBrand** | **Brand to Stock Puzzle Game** with AI Word Clouds | React, Node.js, Gemini API |
 | **⚖️ Smart Rebalancer** | Growth vs Safety modes with Corporate Action Auto-Fix | Sharpe Ratio, Risk Parity |
 | **🕵️ Shadow Tracker** | **Real Institutional Data** (Block Deals, FII Traps) | nselib, Real-time NSE Data |
-| **🎯 Forecast Tracker** | Real-time tracking & management of AI results | yfinance, Interactive st.data_editor |
+| **🎯 Forecast Tracker** | Real-time tracking & management of AI results | yfinance, Interactive React data grid |
 | **👤 Investor Profiler** | **Model Portfolio Generator** with "Sleep Test" | Asset Allocation, Composite Benchmarking |
 | **🧠 Agent Brain** | **Agent Observability** (Memory, Logic, Pivots) | JSON Ledger, Autonomy Logger |
 | **📢 Automated Intel** | **Daily Markets & Weekly Backtests** (Discussions) | GitHub Actions, gh-cli, Dependabot |
@@ -176,7 +176,7 @@ Visualize the **internal thought process** of your AI agents:
 - ✅ **Autonomy Event Stream** - Track real-time decisions like "Regime Changes" and "Tool Pivots".
 - ✅ **Live Logic Matrix** - Understand WHY the agent switched to "Defensive Mode".
 
-**Security:** Input sanitization, rate limiting (20 req/min), persistent session state.
+**Security:** Input sanitization, rate limiting (20 req/min), persistent server-side state.
 
 ---
 
@@ -284,7 +284,7 @@ Market-Rover includes enterprise-grade security:
 | **Input Sanitization** | Regex validation, injection prevention | ✅ Active |
 | **Rate Limiting** | 20-30 requests/minute per features | ✅ Active |
 | **Investment Disclaimer** | Bottom status bar, always visible | ✅ Active |
-| **Secure API Keys** | Environment variables, Streamlit secrets | ✅ Active |
+| **Secure API Keys** | Environment variables, Cloud Run secrets | ✅ Active |
 | **Timezone Handling** | Project-wide timezone-aware operations | ✅ Active |
 
 **Security Score:** 100/100 🟢
@@ -306,7 +306,7 @@ Market-Rover includes enterprise-grade security:
 
 | Service | Usage | Monthly Cost |
 |---------|-------|--------------|
-| Streamlit Cloud | Hosting | **$0** |
+| Google Cloud Run | Hosting (scale-to-zero) | **$0** |
 | Gemini 1.5 Flash | <400K tokens/day | **$0** |
 | yfinance | Stock data | **$0** |
 | Newspaper3k | News scraping | **$0** |
@@ -321,7 +321,7 @@ Market-Rover includes enterprise-grade security:
 
 **If Exceeding Free Tier:**
 - Gemini Paid: ~$1-5/month (500K+ tokens/day)
-- Streamlit Team: $20/month (more resources)
+- Cloud Run: ~$5-15/month (sustained traffic / higher CPU-memory)
 
 ---
 
@@ -335,7 +335,8 @@ Market-Rover includes enterprise-grade security:
 - **Pandas / Numpy** - Data manipulation (IQR statistical filtering)
 
 ### Web UI & Visualization
-- **Streamlit** - Interactive web framework (`st.data_editor`, `st.pills`, `st.session_state`)
+- **React 19 + Vite** - Modern SPA frontend (interactive data grids, filter chips, client-side routing)
+- **FastAPI** - High-performance async API serving the React frontend
 - **Plotly** - High-fidelity interactive charts
 - **Matplotlib/Pillow** - Image generation for snapshots
 
@@ -351,39 +352,45 @@ Market-Rover includes enterprise-grade security:
 
 ```
 Market-Rover/
-├── app.py                      # Main Streamlit app
-├── main.py                     # CLI entry point
-├── agents.py                   # AI agent definitions
-├── tasks.py                    # Agent task definitions
-├── crew.py                     # Crew orchestration
-├── config.py                   # Configuration
-├── requirements.txt            # Python dependencies
-├── .env.example                # Environment template
+├── market_rover/               # v5 Cloud-Native application
+│   ├── Dockerfile                 # Backend image (FastAPI + LangGraph)
+│   ├── docker-compose.yml         # Local dev: backend + frontend + postgres
+│   ├── backend/                   # FastAPI + LangGraph API service
+│   │   ├── requirements.txt          # Backend Python dependencies
+│   │   └── src/
+│   │       ├── server.py                # FastAPI entrypoint (python src/server.py, port 8080)
+│   │       ├── market_rover_graph.py    # 10-node parallel LangGraph
+│   │       ├── agents/                  # Async agent nodes
+│   │       ├── routes/                  # Modular API routers
+│   │       └── utils/                   # DB manager, logger, helpers
+│   └── frontend/                  # React 19 + Vite SPA
+│       ├── Dockerfile                # Frontend image (static build + nginx)
+│       ├── nginx.conf                # SPA routing + /api proxy
+│       ├── vite.config.js
+│       └── src/                      # Tabs, components, context, API client
 │
-├── investbrand/                # Brand to Stock Puzzle Game (React + Node.js)
-│   ├── frontend/                  # React UI with Word Cloud clues
-│   └── backend/                   # Node.js API with Gemini Puzzle Agent
-│
-├── tools/                      # Analysis tools
+├── rover_tools/                # Shared analysis library (used by backend nodes & automation)
 │   ├── market_data.py             # Stock & Option data fetcher
-│   ├── news_scraper.py            # Moneycontrol web scraper
-│   ├── sentiment_analyzer.py      # Gemini-powered classification
-│   ├── market_analytics.py        # Seasonal patterns & iterative forecasting
 │   ├── ticker_resources.py        # Categorized stock indices (Nifty/Sensex)
-│   └── visualizer_tool.py         # Chart generation
+│   ├── shadow_tools.py            # Institutional / block-deal signals
+│   ├── visualizer_tool.py         # Chart generation
+│   └── analytics/                 # Forensic, portfolio, profiler, seasonality engines
 │
-├── utils/                      # Utilities
+├── utils/                      # Shared utilities (used by backend & scripts)
 │   ├── forecast_tracker.py        # Persistence logic for Forecast Tracker
 │   ├── security.py                # Input sanitization, rate limiting
 │   ├── report_visualizer.py       # Portfolio charts
-│   ├── visualizer_interface.py    # Market snapshot generator
-│   ├── llm_interface.py           # Gemini integration
-│   ├── job_manager.py             # Async job tracking
-│   ├── mock_data.py               # Test data generator
-│   ├── logger.py                  # Logging system
-│   └── metrics.py                 # Performance tracking
+│   ├── portfolio_manager.py       # Portfolio parsing & management
+│   └── user_manager.py            # User records
 │
-├── output/                     # Generated snapshots
+├── agents.py                   # AI agent definitions (shared)
+├── crew_engine.py              # Orchestration engine (shared)
+├── config.py                   # Configuration (shared)
+├── scripts/                    # Automation (daily reports, backtests, SRE sentinel)
+├── requirements.txt            # Root shared-library dependencies
+├── .env.example                # Environment template
+│
+├── .github/workflows/          # CI/CD (market_rover_deploy.yml → Cloud Run)
 ├── reports/                    # Intelligence reports
 ├── logs/                       # Application logs
 └── metrics/                    # Performance metrics
@@ -406,79 +413,24 @@ CONVERT_TO_CRORES=true         # Currency formatting
 MAX_ITERATIONS=5               # Max agent reasoning loops
 PORTFOLIO_FILE=Portfolio.csv   # Default portfolio filename
 RATE_LIMIT_DELAY=1.0           # Delay between API calls
-WEB_PORT=8501                  # Streamlit port
-WEB_HOST=0.0.0.0               # Streamlit host
 ```
 
-### 🔐 Social Login & Authentication (Production)
+The FastAPI backend listens on port `8080` by default (`python src/server.py`); the React frontend dev server runs via `npm run dev`.
 
-Market-Rover supports **Multi-Provider Social Login** out of the box. To enable these, add the following to your `.streamlit/secrets.toml` (locally) or Streamlit Cloud Secrets:
+### 🔐 Google Login & Authentication (Production)
 
-#### 1. Google Login
-```toml
-[oauth.google]
-client_id = "your-google-client-id"
-client_secret = "your-google-client-secret"
-authorize_endpoint = "https://accounts.google.com/o/oauth2/v2/auth"
-token_endpoint = "https://oauth2.googleapis.com/token"
-user_info_endpoint = "https://www.googleapis.com/oauth2/v3/userinfo"
-redirect_uri = "https://market-rover.streamlit.app"
-icon = "google"
+Authentication is handled by the **FastAPI backend** via **Google OAuth** and signed JWTs. Configure the following environment variables (locally in the backend `.env`, and as Cloud Run / GitHub secrets in production):
+
+```bash
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+JWT_SECRET=your-jwt-signing-secret
 ```
 
-#### 2. X (Twitter) Login
-```toml
-[oauth.x]
-client_id = "your-x-client-id"
-client_secret = "your-x-client-secret"
-authorize_endpoint = "https://twitter.com/i/oauth2/authorize"
-token_endpoint = "https://api.twitter.com/2/oauth2/token"
-user_info_endpoint = "https://api.twitter.com/2/users/me"
-redirect_uri = "https://market-rover.streamlit.app"
-scope = "users.read tweet.read openid email"
-icon = "twitter"
-```
-
-#### 3. Facebook & Instagram Login
-```toml
-[oauth.facebook]
-client_id = "your-fb-app-id"
-client_secret = "your-fb-app-secret"
-authorize_endpoint = "https://www.facebook.com/v12.0/dialog/oauth"
-token_endpoint = "https://graph.facebook.com/v12.0/oauth/access_token"
-user_info_endpoint = "https://graph.facebook.com/me"
-user_info_params = { fields = "id,name,email" }
-redirect_uri = "https://market-rover.streamlit.app"
-scope = "email,public_profile"
-icon = "facebook"
-```
-
-#### 4. LinkedIn Login
-```toml
-[oauth.linkedin]
-client_id = "your-linkedin-id"
-client_secret = "your-linkedin-secret"
-authorize_endpoint = "https://www.linkedin.com/oauth/v2/authorization"
-token_endpoint = "https://www.linkedin.com/oauth/v2/accessToken"
-user_info_endpoint = "https://api.linkedin.com/v2/me"
-redirect_uri = "https://market-rover.streamlit.app"
-scope = "r_liteprofile r_emailaddress"
-icon = "link"
-```
-
-> [!NOTE]
-> **WhatsApp Login**: For WhatsApp, we recommend using the **Meta Login** (Facebook) as it integrates with the Meta identity ecosystem. Direct "Login with WhatsApp" buttons typically require a Meta Business Account and a third-party bridge or specialized API.
+The backend exchanges the OAuth code, verifies the Google identity, and issues a JWT that the React frontend stores and sends on subsequent API calls.
 
 ---
 
-### 🛡️ Access Control (Whitelist)
-
-To restrict access to specific team members, add an `approved_emails` list to your secrets:
-
-```toml
-approved_emails = ["investor1@example.com", "analyst2@market-rover.in"]
-```
-If this list is missing or empty, the app defaults to **Open Access** (anyone with a valid social account can login).
 ### 🤖 Automated Market Intelligence
 
 - **Daily Report**: The system generates a comprehensive market report every day at 00:00 UTC and posts it to **GitHub Discussions**.
@@ -545,7 +497,7 @@ pip install lxml lxml_html_clean
 
 ## 📚 Documentation
 
-- `DEPLOYMENT.md` - Streamlit Cloud deployment guide
+- `DEPLOYMENT.md` - Local dev & Google Cloud Run deployment guide
 - `SECURITY_FIXES_SUMMARY.md` - Security implementation details
 - `SESSION_SUMMARY_DEC22.md` - Latest development session
 - `FINAL_AUDIT_CHECKLIST.md` - Comprehensive audit report
@@ -573,18 +525,27 @@ pip install lxml lxml_html_clean
 
 ### Local Development
 ```bash
-streamlit run app.py
+# Backend (FastAPI + LangGraph)
+cd market_rover/backend
+pip install -r requirements.txt
+python src/server.py            # http://localhost:8080
+
+# Frontend (React + Vite) — separate terminal
+cd market_rover/frontend
+npm install
+npm run dev
 ```
 
-### Production (Streamlit Cloud)
+### Production (Google Cloud Run via GitHub Actions)
 
-1. Push code to GitHub
-2. Go to https://share.streamlit.io
-3. Create new app → Select repository
-4. Add secrets (Gemini API key)
-5. **Auto-deploy enabled!** (push → deploy in 2-5 min)
+1. Push code to `main` with changes under `market_rover/` (or shared root libs).
+2. The `.github/workflows/market_rover_deploy.yml` workflow runs backend tests, builds images via Cloud Build, and deploys to Cloud Run.
+3. Two services are deployed: `market-rover-api` (backend) and `market-rover-ui` (frontend).
+4. Required GitHub secrets: `GCP_SA_KEY`, `OPENAI_API_KEY`, `PROD_DB_PASSWORD`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `JWT_SECRET`, `CODECOV_TOKEN`.
 
-**Current Production:** https://market-rover.streamlit.app/
+**Current Production:** https://market-rover-ui-9514347926.us-central1.run.app/
+
+See `DEPLOYMENT.md` for the full guide.
 
 ---
 
@@ -617,7 +578,8 @@ Personal use. Ensure compliance with data source terms of service:
 **Built with:**
 - [CrewAI](https://www.crewai.com/) - Multi-agent framework
 - [Google Gemini](https://ai.google.dev/) - Large language model
-- [Streamlit](https://streamlit.io/) - Web framework
+- [React](https://react.dev/) - Frontend UI library
+- [FastAPI](https://fastapi.tiangolo.com/) - Backend web framework
 - [Plotly](https://plotly.com/) - Visualization library
 - [yfinance](https://github.com/ranaroussi/yfinance) - Financial data
 - [Newspaper3k](https://newspaper.readthedocs.io/) - News scraping

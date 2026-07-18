@@ -19,7 +19,6 @@ MAPPING = {
     'googleapiclient': 'google-api-python-client',
     'crewai': 'crewai',
     'crewai_tools': 'crewai-tools',
-    'streamlit': 'streamlit',
     'plotly': 'plotly',
     'pandas': 'pandas',
     'numpy': 'numpy',
@@ -52,12 +51,6 @@ MAPPING = {
     'pytz': 'pytz',
     'tzlocal': 'tzlocal',
     'validators': 'validators',
-    'streamlit_option_menu': 'streamlit-option-menu',
-    'st_aggrid': 'streamlit-aggrid',
-    'extra_streamlit_components': 'extra-streamlit-components',
-    'streamlit_lottie': 'streamlit-lottie',
-    'streamlit_calendar': 'streamlit-calendar',
-    'streamlit_authenticator': 'streamlit-authenticator'
 }
 
 def get_imports(root_dir):
@@ -100,7 +93,6 @@ def main():
     true_third_party.discard('agents')
     true_third_party.discard('tasks')
     true_third_party.discard('crew_engine')
-    true_third_party.discard('tabs')
     
     print("\n--- Detected Direct Imports ---")
     

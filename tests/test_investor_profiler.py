@@ -47,6 +47,16 @@ def test_generate_smart_portfolio_defender(profiler):
     assert has_div
     assert sum(h['Weight (%)'] for h in holdings) == pytest.approx(100.0, abs=0.5)
 
+def test_generate_smart_portfolio_defender_clips_excess_picks(profiler):
+    """Defender max is 3 — excess user picks must not inflate portfolio size."""
+    brands = [
+        'EICHERMOT.NS', 'HEROMOTOCO.NS', 'LTIM.NS', 'TECHM.NS',
+        'TITAN.NS', 'TMPV.NS', 'ULTRACEMCO.NS', 'HDFCLIFE.NS',
+    ]
+    holdings = profiler.generate_smart_portfolio(InvestorPersona.DEFENDER, user_picked_brands=brands)
+    assert len(holdings) == 3
+    assert sum(h['Weight (%)'] for h in holdings) == pytest.approx(100.0, abs=0.5)
+
 def test_generate_smart_portfolio_compounder(profiler):
     holdings = profiler.generate_smart_portfolio(InvestorPersona.COMPOUNDER, user_picked_brands=['RELIANCE.NS'])
     print(f"\nCompounder Holdings: {holdings}")

@@ -241,8 +241,7 @@ def scrape_stock_news(symbol: str) -> str:
         return asyncio.run(async_scrape_stock_run(symbol))
     except RuntimeError:
         # If loop is already running (e.g. inside another async env), we need to handle it.
-        # Streamlit doesn't run a loop by default in the script thread.
-        # But if we are called from an Executor, it's fine.
+        # If we are called from an Executor, it's fine.
         # Fallback: Just create a loop.
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)

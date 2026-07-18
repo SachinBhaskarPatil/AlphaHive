@@ -1,6 +1,7 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
+from config import resolve_ticker
 
 class ForensicAnalyzer:
     """
@@ -13,8 +14,8 @@ class ForensicAnalyzer:
     """
 
     def __init__(self, ticker_symbol):
-        self.ticker_symbol = ticker_symbol
-        self.ticker = yf.Ticker(ticker_symbol)
+        self.ticker_symbol = resolve_ticker(ticker_symbol.replace("$", "").strip().upper())
+        self.ticker = yf.Ticker(self.ticker_symbol)
         
         # Data Cache
         self.balance_sheet = None

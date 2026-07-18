@@ -46,8 +46,11 @@ class PortfolioValidator:
                 if score > 60:
                      msg = f"Shadow Score: {score}/100 (Accumulation Detected)"
                      # Append to reasoning, don't overwrite if Red
-                     if flags[ticker]['status'] != 'RED':
-                         flags[ticker]['reason'] += f" | {msg}"
+                     if flags.get(ticker, {}).get('status') != 'RED':
+                         if ticker in flags:
+                             flags[ticker]['reason'] += f" | {msg}"
+                         else:
+                             flags[ticker] = {"status": "AMBER", "reason": msg}
             except:
                 pass
 
@@ -133,7 +136,23 @@ class InvestorProfiler:
             user_alpha_brands: List of ticker strings (e.g. ['BEL.NS']) - mapped to Alpha/Midcap (Hunter only)
         """
         strategy = self.get_allocation_strategy(persona)
+        max_tickers = strategy.get("max_tickers", 6)
         holdings = []
+
+        # Clip user picks to persona ticker limit — excess picks must not bypass AI guardrails
+        user_picked_brands = list(user_picked_brands or [])[:max_tickers]
+        if persona == self.personas.HUNTER:
+            growth_cap = max(0, max_tickers - len(user_picked_brands))
+            user_growth_brands = list(user_growth_brands or [])[:growth_cap]
+            alpha_cap = max(0, max_tickers - len(user_picked_brands) - len(user_growth_brands))
+            user_alpha_brands = list(user_alpha_brands or [])[:alpha_cap]
+        elif persona == self.personas.COMPOUNDER:
+            growth_cap = max(0, max_tickers - len(user_picked_brands))
+            user_growth_brands = list(user_growth_brands or [])[:growth_cap]
+            user_alpha_brands = []
+        else:
+            user_growth_brands = []
+            user_alpha_brands = []
         
         # 1. Fill Core Slots with User Picks (validated)
         # We respect user choice but clip to allocation
@@ -280,7 +299,7 @@ class InvestorProfiler:
         
         # Next 50 Proxies
         next50_pool = [
-             "ZOMATO.NS", "DLF.NS", "HAL.NS", "SIEMENS.NS", 
+             "ETERNAL.NS", "DLF.NS", "HAL.NS", "SIEMENS.NS", 
              "VBL.NS", "TRENT.NS", "GODREJCP.NS", "PIDILITIND.NS"
         ]
         
@@ -345,7 +364,7 @@ class InvestorProfiler:
                 added_mid += 1
 
         # Bucket 2: Next 50 (2)
-        next50_pool = ["ZOMATO.NS", "HAL.NS", "BEL.NS", "DLF.NS", "VBL.NS"]
+        next50_pool = ["ETERNAL.NS", "HAL.NS", "BEL.NS", "DLF.NS", "VBL.NS"]
         added_next = 0
         for n in next50_pool:
             if n not in current_syms and added_next < 2:

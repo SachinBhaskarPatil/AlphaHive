@@ -28,7 +28,7 @@ This guide covers how to handle operational issues that require manual intervent
     .\.venv\Scripts\Activate
     pip install -r requirements.txt
     ```
-2.  **Check Deployment**: If on Streamlit Cloud, check `packages.txt` and `requirements.txt`.
+2.  **Check Deployment**: If on Cloud Run, verify the service's `requirements.txt` is complete and rebuild the image (via GitHub Actions or `gcloud builds submit`).
 
 
 ### 3. Missing Data Files (FileNotFoundError)
@@ -92,7 +92,7 @@ This guide covers how to handle operational issues that require manual intervent
 
 Please note what is **NOT** covered by the automated retry system:
 
-*   **Streamlit UI Crashes**: If the web page freezes or shows a big red traceback box, that is a UI error. You must refresh the page (`F5`).
+*   **React Web UI Crashes**: If the web page freezes or shows an error boundary / blank screen, that is a frontend error. Refresh the page (`F5`); if it persists, check the browser console and the `market-rover-api` backend logs.
 *   **External CI/CD**: Errors in GitHub Actions or Docker deployment pipelines are outside this application's control. Check the GitHub "Actions" tab.
 *   **Infrastructure**: If the server runs out of memory (OOM) or disk space, the application will crash. This requires system-level monitoring.
 

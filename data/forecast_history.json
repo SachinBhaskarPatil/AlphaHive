@@ -500,6 +500,100 @@
         ],
         "status": "active"
       }
+    ],
+    "sbpatil652002@gmail.com": [
+      {
+        "timestamp": "2026-07-07T20:23:48.259888",
+        "ticker": "CIPLA.NS",
+        "current_price": 1451.800048828125,
+        "target_price": 1672.95,
+        "target_date": "2026-12-31",
+        "strategy": "Median Strategy",
+        "confidence": "High",
+        "years_tested": 3,
+        "status": "active"
+      },
+      {
+        "timestamp": "2026-07-07T20:23:43.068925",
+        "ticker": "BRITANNIA.NS",
+        "current_price": 5447.0,
+        "target_price": 6071.15,
+        "target_date": "2026-12-31",
+        "strategy": "Median Strategy",
+        "confidence": "High",
+        "years_tested": 3,
+        "status": "active"
+      },
+      {
+        "timestamp": "2026-07-07T20:21:07.722160",
+        "ticker": "BPCL.NS",
+        "current_price": 313.95001220703125,
+        "target_price": 351.97,
+        "target_date": "2026-12-31",
+        "strategy": "SD Strategy",
+        "confidence": "High",
+        "years_tested": 3,
+        "status": "active"
+      },
+      {
+        "timestamp": "2026-07-06T18:13:06.326434",
+        "ticker": "TCS.NS",
+        "current_price": 2057.60009765625,
+        "target_price": 2325.07,
+        "target_date": "2026-12-31",
+        "strategy": "Median Strategy",
+        "confidence": "High",
+        "years_tested": 3,
+        "status": "active"
+      },
+      {
+        "timestamp": "2026-07-06T18:05:06.457024",
+        "ticker": "ITC.NS",
+        "current_price": 288.25,
+        "target_price": 308.39,
+        "target_date": "2026-12-31",
+        "strategy": "Median Strategy",
+        "confidence": "High",
+        "years_tested": 3,
+        "status": "active"
+      },
+      {
+        "timestamp": "2026-07-06T17:32:24.326884",
+        "ticker": "DRREDDY.NS",
+        "current_price": 1367.9000244140625,
+        "target_price": 1527.1,
+        "target_date": "2026-12-31",
+        "strategy": "Median Strategy",
+        "confidence": "High",
+        "years_tested": 3,
+        "status": "active"
+      },
+      {
+        "timestamp": "2026-06-21T12:04:50.130521",
+        "ticker": "HEROMOTOCO.NS",
+        "current_price": 4974.89990234375,
+        "target_price": 5536.095488354929,
+        "target_date": "2026-12-31",
+        "strategy": "SD Strategy",
+        "confidence": "High",
+        "years_tested": [
+          2025,
+          2024,
+          2023
+        ],
+        "status": "active"
+      },
+      {
+        "timestamp": "2026-07-16T23:34:23.434854",
+        "ticker": "^BSESN",
+        "current_price": 77186.8671875,
+        "target_price": 84313.16,
+        "target_date": "2026-12-31",
+        "strategy": "Median Strategy",
+        "confidence": "High",
+        "years_tested": 3,
+        "status": "active"
+      }
     ]
   }
 }

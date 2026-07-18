@@ -28,8 +28,8 @@
 
 ### ✅ **4. Production Deployment**
 - **GitHub** - All changes committed and pushed
-- **Streamlit Cloud** - Auto-deployed successfully
-- **Live URL:** https://market-rover.streamlit.app/
+- **Google Cloud Run** - Auto-deployed successfully
+- **Live URL:** https://market-rover-ui-9514347926.us-central1.run.app/
 
 ---
 
@@ -175,7 +175,7 @@ Status: ✅ Live in production
 
 ### **Current Costs:**
 ```
-Streamlit Cloud: $0 (Free tier)
+Google Cloud Run: $0 (Free tier)
 Gemini API: $0 (Free tier, <400K tokens/day)
 GitHub: $0 (Public repo)
 Total: $0/month ✅
@@ -200,7 +200,7 @@ Cold Start: ~30 seconds (if sleeping)
 | 18:53 | All tests passed | ✅ |
 | 18:57 | Git commit created | ✅ |
 | 18:58 | Pushed to GitHub | ✅ |
-| 19:00 | Streamlit reboot initiated | ✅ |
+| 19:00 | Service reboot initiated | ✅ |
 | 19:02 | Production deployment complete | ✅ |
 | 19:10-19:50 | UI refinements (version labels, tabs, sidebar) | ✅ |
 | 19:50 | **FINAL DEPLOYMENT COMPLETE** | ✅ |
@@ -232,7 +232,7 @@ Cold Start: ~30 seconds (if sleeping)
 
 ### **Deployment:**
 - [x] Code on GitHub
-- [x] Live on Streamlit Cloud
+- [x] Live on Google Cloud Run
 - [x] Auto-deployment configured
 - [x] Documentation complete
 - [x] Tests passed
@@ -277,7 +277,7 @@ Cold Start: ~30 seconds (if sleeping)
 
 ## 📞 PRODUCTION ACCESS
 
-**Live App:** https://market-rover.streamlit.app/
+**Live App:** https://market-rover-ui-9514347926.us-central1.run.app/
 
 **GitHub Repo:** https://github.com/SankarGaneshb/Market-Rover
 
@@ -323,4 +323,4 @@ Cold Start: ~30 seconds (if sleeping)
 *Session completed: December 22, 2025, 19:50 IST*  
 *Total duration: ~1.5 hours*  
 *Commits: 12 | Files: 3 | Lines: 2,800+*  
-*Production URL: https://market-rover.streamlit.app/*
+*Production URL: https://market-rover-ui-9514347926.us-central1.run.app/*

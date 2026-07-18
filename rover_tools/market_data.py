@@ -1,7 +1,7 @@
 import yfinance as yf
-from nsepython import nse_optionchain_scrapper
 import pandas as pd
 import datetime
+from config import resolve_ticker
 from utils.logger import get_logger
 from utils.metrics import track_error_detail
 from utils.retry import retry_operation
@@ -36,7 +36,7 @@ class MarketDataFetcher:
         Fetches the Last Traded Price (LTP) with NSE -> BSE fallback.
         """
         # Sanitize input
-        ticker = ticker.replace("$", "").strip().upper()
+        ticker = resolve_ticker(ticker.replace("$", "").strip().upper())
         
         # Determine strict NSE and BSE variants
         base_ticker = ticker.replace(".NS", "").replace(".BO", "")
@@ -71,7 +71,7 @@ class MarketDataFetcher:
         Fetches historical data with NSE -> BSE fallback.
         """
         # Sanitize input
-        ticker = ticker.replace("$", "").strip().upper()
+        ticker = resolve_ticker(ticker.replace("$", "").strip().upper())
         base_ticker = ticker.replace(".NS", "").replace(".BO", "")
         
         # Index handling
@@ -107,8 +107,9 @@ class MarketDataFetcher:
         Fetches the Option Chain JSON using nsepython.
         """
         try:
+            from nsepython import nse_optionchain_scrapper
             # nsepython expects symbol without .NS
-            symbol = ticker.replace(".NS", "").replace(".BO", "")
+            symbol = resolve_ticker(ticker).replace(".NS", "").replace(".BO", "")
             payload = nse_optionchain_scrapper(symbol)
             return payload
         except Exception as e:

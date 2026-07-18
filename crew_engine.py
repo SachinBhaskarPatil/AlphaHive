@@ -94,14 +94,13 @@ class MarketRoverCrew:
             track_workflow_end(session_id, "failed")
             try:
                 track_error_detail(
-                    error_type="CrewExecutionError",
-                    message=str(e),
+                    "CrewExecutionError",
+                    str(e),
                     context={
                         'max_parallel_stocks': self.max_parallel_stocks,
                         'num_agents': len(self.agents),
-                        'session_id': session_id
+                        'session_id': session_id,
                     },
-                    user_id=None,
                 )
             except Exception:
                 logger.debug("Failed to persist crew error detail")

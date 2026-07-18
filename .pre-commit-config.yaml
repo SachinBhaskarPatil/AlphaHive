@@ -24,8 +24,8 @@ repos:
         pass_filenames: false
 
       - id: root-app-compile
-        name: Root Streamlit App Syntax Check
-        entry: python -m py_compile app.py agents.py tasks.py config.py
+        name: Root Module Syntax Check
+        entry: python -m py_compile agents.py tasks.py config.py crew_engine.py
         language: system
-        files: ^(app\.py|agents\.py|tasks\.py|config\.py)$
+        files: ^(agents\.py|tasks\.py|config\.py|crew_engine\.py)$
         pass_filenames: false

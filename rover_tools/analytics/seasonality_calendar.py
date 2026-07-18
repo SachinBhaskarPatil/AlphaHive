@@ -1,8 +1,6 @@
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from datetime import datetime, timedelta
 import calendar
 
@@ -365,6 +363,8 @@ class SeasonalityCalendar:
         """
         Returns a Matplotlib Figure: Side-by-Side Layout (2026 Buy vs 2027 Sell)
         """
+        import matplotlib.pyplot as plt  # lazy: plotting deps not needed for API analysis
+
         # Force white style
         plt.style.use('default') 
         

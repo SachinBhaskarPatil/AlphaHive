@@ -10,6 +10,25 @@ from utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
+def _extract_close(data: pd.DataFrame) -> pd.Series:
+    """Normalize yfinance download output to a single Close price series."""
+    if data is None or data.empty:
+        return pd.Series(dtype=float)
+    close = pd.Series(dtype=float)
+    if isinstance(data.columns, pd.MultiIndex):
+        if "Close" in data.columns.get_level_values(0):
+            close = data.xs("Close", axis=1, level=0)
+        elif "Close" in data.columns.get_level_values(1):
+            close = data.xs("Close", axis=1, level=1)
+    elif "Close" in data.columns:
+        close = data["Close"]
+    else:
+        return pd.Series(dtype=float)
+    if isinstance(close, pd.DataFrame):
+        close = close.iloc[:, 0]
+    return close.dropna()
+
 # --- 1. Portfolio Manager Skill ---
 @tool("calculate_portfolio_risk_tool")
 def calculate_portfolio_risk_tool(portfolio_json: str) -> str:
@@ -64,20 +83,21 @@ def detect_technical_patterns_tool(ticker: str) -> str:
     Input: Stock ticker (e.g., INFY.NS)
     """
     try:
-        data = yf.download(ticker, period="1mo", interval="1d", progress=False)
-        if data.empty:
+        data = yf.download(ticker, period="1mo", interval="1d", progress=False, auto_adjust=True)
+        close = _extract_close(data)
+        if close.empty:
              return f"No technical data for {ticker}"
 
         # Simple RSI (14)
-        delta = data['Close'].diff()
+        delta = close.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
         loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
         rs = gain / loss
-        rsi = 100 - (100 / (1 + rs)).iloc[-1]
+        rsi = float((100 - (100 / (1 + rs))).iloc[-1])
 
         # MACD (12, 26, 9)
-        exp1 = data['Close'].ewm(span=12, adjust=False).mean()
-        exp2 = data['Close'].ewm(span=26, adjust=False).mean()
+        exp1 = close.ewm(span=12, adjust=False).mean()
+        exp2 = close.ewm(span=26, adjust=False).mean()
         macd = exp1 - exp2
         signal = macd.ewm(span=9, adjust=False).mean()
 
@@ -187,16 +207,19 @@ def calculate_mtc_score_tool(ticker: str) -> str:
     Input: Stock ticker (e.g., INFY.NS)
     """
     try:
-        # Fetch Daily and 1h data
-        d_data = yf.download(ticker, period="1mo", interval="1d", progress=False)
-        h_data = yf.download(ticker, period="5d", interval="1h", progress=False)
+        d_data = yf.download(ticker, period="1mo", interval="1d", progress=False, auto_adjust=True)
+        h_data = yf.download(ticker, period="5d", interval="1h", progress=False, auto_adjust=True)
 
-        if d_data.empty or h_data.empty:
+        d_close = _extract_close(d_data)
+        h_close = _extract_close(h_data)
+
+        if d_close.empty or h_close.empty:
             return f"MTC Score for {ticker}: Insufficient Data"
 
-        # Check Trend (Price > 20EMA)
-        d_trend = d_data['Close'].iloc[-1] > d_data['Close'].ewm(span=20).mean().iloc[-1]
-        h_trend = h_data['Close'].iloc[-1] > h_data['Close'].ewm(span=20).mean().iloc[-1]
+        d_ema = d_close.ewm(span=20, adjust=False).mean().iloc[-1]
+        h_ema = h_close.ewm(span=20, adjust=False).mean().iloc[-1]
+        d_trend = bool(d_close.iloc[-1] > d_ema)
+        h_trend = bool(h_close.iloc[-1] > h_ema)
 
         score = 0
         if d_trend and h_trend:

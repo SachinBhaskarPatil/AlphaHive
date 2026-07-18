@@ -43,6 +43,18 @@ def test_get_common_tickers():
     all_tickers = ticker_resources.get_common_tickers("All")
     assert len(all_tickers) > len(nifty)
 
+def test_get_brand_meta():
+    nifty = ticker_resources.get_brand_meta("RELIANCE.NS", category="Nifty 50")
+    assert nifty["color"] == ticker_resources.NIFTY_50_BRAND_META["RELIANCE.NS"]["color"]
+
+    next50 = ticker_resources.get_brand_meta("ABB.NS", category="Nifty Next 50")
+    assert next50["color"] != "#334155"
+    assert next50["color"] == ticker_resources.TICKER_COLOR_OVERRIDES["ABB.NS"]
+
+    midcap = ticker_resources.get_brand_meta("VOLTAS.NS", category="Midcap")
+    assert midcap["color"] != "#334155"
+
+
 def test_get_ticker_name():
     # Test exact match
     name = ticker_resources.get_ticker_name("RELIANCE.NS")

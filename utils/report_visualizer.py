@@ -2,7 +2,10 @@
 Report visualization utilities for Market-Rover 2.0
 Generates interactive charts and exports to multiple formats
 """
+import html as html_module
+import json
 import plotly.graph_objects as go
+import plotly.io as pio
 
 import pandas as pd
 from typing import Dict, List
@@ -110,21 +113,23 @@ class ReportVisualizer:
                 line=dict(color='white', width=2)
             ),
             text=[f"{score}" for score in risk_scores],
-            textposition='auto',
+            textposition='outside',
+            textfont=dict(size=14, color='#1f2937', family='monospace'),
+            cliponaxis=False,
             hovertemplate='<b>%{x}</b><br>Risk Score: %{y}<br>Shadow Score: %{customdata[1]} (%{customdata[2]})<br>Sentiment: %{customdata[0]}<extra></extra>',
             customdata=custom_data_combined
         ))
         
         fig.update_layout(
             title={
-                'text': '🗺️ Portfolio Risk Heatmap',
+                'text': '📊 Portfolio Risk Scores',
                 'x': 0.5,
                 'xanchor': 'center',
-                'font': {'size': 20}
+                'font': {'size': 18}
             },
             xaxis_title='Stock Symbol',
             yaxis_title='Risk Score (0-100)',
-            yaxis=dict(range=[0, 100]),
+            yaxis=dict(range=[0, min(110, max(risk_scores + [0]) + 15)]),
             height=400,
             paper_bgcolor='white',
             plot_bgcolor='white',
@@ -148,6 +153,8 @@ class ReportVisualizer:
         Returns:
             Plotly figure object
         """
+        short_name = stock_name.split(".")[0] if stock_name else "Stock"
+
         # Determine color based on risk
         if risk_score < 30:
             color = self.color_scheme['positive']
@@ -159,7 +166,7 @@ class ReportVisualizer:
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
             value=risk_score,
-            title={'text': f"{stock_name} Risk Level", 'font': {'size': 16}},
+            title={'text': short_name, 'font': {'size': 13}},
             gauge={
                 'axis': {'range': [0, 100]},
                 'bar': {'color': color},
@@ -177,9 +184,10 @@ class ReportVisualizer:
         ))
         
         fig.update_layout(
-            height=300,
+            height=170,
+            margin=dict(l=8, r=8, t=48, b=4),
             paper_bgcolor='white',
-            font={'size': 14}
+            font={'size': 12}
         )
         
         return fig
@@ -238,6 +246,15 @@ class ReportVisualizer:
         )
         
         return fig
+
+    def _figure_to_embed_html(self, fig: go.Figure) -> str:
+        """Serialize figures as plain JSON arrays (avoids Plotly binary bdata in saved HTML)."""
+        clean = pio.from_json(pio.to_json(fig, validate=False))
+        return clean.to_html(
+            full_html=False,
+            include_plotlyjs=False,
+            config={"responsive": True, "displayModeBar": True},
+        )
     
     def export_to_html(self, figures: List[go.Figure], report_text: str, output_path: Path) -> Path:
         """
@@ -251,13 +268,19 @@ class ReportVisualizer:
         Returns:
             Path to saved HTML file
         """
+        try:
+            import config
+            brand = config.APP_DISPLAY_NAME
+        except Exception:
+            brand = "AlphaHive"
+
         html_content = f"""
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Market-Rover 2.0 Intelligence Report</title>
+    <title>{brand} Intelligence Report</title>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
         body {{
@@ -287,6 +310,14 @@ class ReportVisualizer:
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }}
+        .chart-plot {{
+            width: 100%;
+            margin: 16px 0;
+            overflow-x: auto;
+        }}
+        .chart-plot .plotly-graph-div {{
+            width: 100% !important;
+        }}
         .report-text {{
             background: white;
             padding: 30px;
@@ -308,7 +339,7 @@ class ReportVisualizer:
 </head>
 <body>
     <div class="report-header">
-        <h1>🔍 Market-Rover Intelligence Report</h1>
+        <h1>🔍 {brand} Intelligence Report</h1>
         <p>Generated: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
     </div>
     
@@ -318,8 +349,8 @@ class ReportVisualizer:
         
         # Add each figure
         for i, fig in enumerate(figures):
-            fig_html = fig.to_html(full_html=False, include_plotlyjs=False)
-            html_content += f'<div id="chart{i}">{fig_html}</div>\n'
+            fig_html = self._figure_to_embed_html(fig)
+            html_content += f'<div id="chart{i}" class="chart-plot">{fig_html}</div>\n'
         
         html_content += """
     </div>
@@ -327,13 +358,14 @@ class ReportVisualizer:
     <div class="report-text">
         <h2>📄 Detailed Analysis</h2>
 """
-        html_content += f"<pre>{report_text}</pre>"
+        safe_text = html_module.escape(str(report_text))
+        html_content += f"<pre>{safe_text}</pre>"
         
         html_content += """
     </div>
     
     <div class="footer">
-        <p>Generated by Market-Rover - AI-Powered Stock Intelligence System</p>
+        <p>Generated by {brand} — AI-powered stock intelligence</p>
     </div>
 </body>
 </html>
@@ -357,43 +389,57 @@ class ReportVisualizer:
             Plotly figure object
         """
         import numpy as np
-        
-        # Create mask
-        mask = np.triu(np.ones_like(matrix, dtype=bool))
-        
-        # Apply mask by setting upper triangle to None (Plotly handles None as transparency in heatmap usually, 
-        # or we might need to rely on custom text or filtering values. 
-        # Actually Plotly Heatmap doesn't support 'mask' natively like Seaborn.
-        # We must set values to None or NaN.)
-        
-        # Convert to float for safety (avoid int issues with None)
-        matrix_masked = matrix.where(~mask, None)
+
+        z = matrix.astype(float).values
+        upper_mask = np.triu(np.ones_like(z, dtype=bool), k=1)
+
+        labels = [str(c).split(".")[0] for c in matrix.columns]
+        n = z.shape[0]
+
+        z_list = []
+        text_list = []
+        for i in range(n):
+            z_row = []
+            text_row = []
+            for j in range(n):
+                if upper_mask[i, j]:
+                    z_row.append(None)
+                    text_row.append("")
+                else:
+                    val = float(z[i, j])
+                    z_row.append(round(val, 4))
+                    text_row.append(f"{val:.2f}")
+            z_list.append(z_row)
+            text_list.append(text_row)
 
         fig = go.Figure(data=go.Heatmap(
-            z=matrix_masked.values,
-            x=matrix_masked.columns,
-            y=matrix_masked.index,
-            text=matrix_masked.values,
-            texttemplate="%{text:.2f}",
+            z=z_list,
+            x=labels,
+            y=labels,
+            text=text_list,
+            texttemplate="%{text}",
             textfont={"size": 10},
             colorscale='RdBu_r',
-            zmin=-1, 
+            zmin=-1,
             zmax=1,
-            xgap=1, 
-            ygap=1,
-            hoverongaps=False
+            xgap=2,
+            ygap=2,
+            hoverongaps=False,
+            showscale=True,
+            hovertemplate='%{y} vs %{x}<br>Correlation: %{z:.2f}<extra></extra>',
         ))
         
         fig.update_layout(
             title={
-                'text': '🔗 Correlation Heatmap (Lower Triangle)',
+                'text': '🔗 Correlation Heatmap',
                 'x': 0.5,
                 'xanchor': 'center',
-                'font': {'size': 20}
+                'font': {'size': 18}
             },
-            height=500,
-            width=500,
-            yaxis_autorange='reversed', # Upper left origin
+            height=max(420, n * 36 + 120),
+            margin=dict(l=80, r=60, t=60, b=100),
+            yaxis=dict(autorange='reversed', tickfont=dict(size=10)),
+            xaxis=dict(tickangle=-45, tickfont=dict(size=10)),
             paper_bgcolor='white',
             plot_bgcolor='white'
         )

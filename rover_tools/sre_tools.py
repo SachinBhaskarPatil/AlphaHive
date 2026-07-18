@@ -4,8 +4,11 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+from crewai.tools import tool
+
 HIL_REQUESTS_FILE = Path("/app/data/hil_requests.json")
 
+@tool("Propose System Remediation")
 def propose_system_remediation(issue_description: str, suggested_fix: str, risk_level: str = "Medium"):
     """
     Called by the SRE Agent when a system bottleneck is detected.
