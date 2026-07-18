@@ -1,9 +1,0 @@
-.git
-node_modules/
-build/
-coverage/
-# .env is removed from ignore to allow Google/Firebase keys to reach build
-.DS_Store
-*.log
-coverage_report.txt
-local_coverage.txt
