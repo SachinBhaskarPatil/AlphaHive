@@ -99,6 +99,24 @@ logs/
 metrics/
 metrics_*.json
 
+# ----- Scratch / dump artifacts (transient dev output, never commit) -----
+*_log.txt
+ci_log*.txt
+full_deploy_log.txt
+*_history.txt
+failures*.txt
+diff*.txt
+log_utf8.txt
+status*.txt
+*_out.txt
+*_output.txt
+runs.txt
+result.txt
+win_results.txt
+pr_test_out.txt
+coverage_full.txt
+coverage_report.txt
+
 # ----- Generated reports (all nested paths) -----
 reports/**/*.txt
 reports/**/*.html

@@ -3,16 +3,16 @@
 # Docs: https://render.com/docs/blueprint-spec
 
 databases:
-  - name: market-rover-db
+  - name: alphahive-db
     plan: free
 
 services:
   # ---------- Backend: FastAPI ----------
   - type: web
-    name: market-rover-api
+    name: alphahive-api
     runtime: python
     plan: free
-    rootDir: market_rover/backend
+    rootDir: AlphaHive/backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn src.server:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
@@ -21,7 +21,7 @@ services:
         value: "3.13.1"
       - key: DATABASE_URL
         fromDatabase:
-          name: market-rover-db
+          name: alphahive-db
           property: connectionString
       # Secrets — set these values in the Render dashboard (sync:false keeps them out of git)
       - key: OPENAI_API_KEY
@@ -33,9 +33,9 @@ services:
 
   # ---------- Frontend: React + Vite (static) ----------
   - type: web
-    name: market-rover-web
+    name: alphahive-web
     runtime: static
-    rootDir: market_rover/frontend
+    rootDir: AlphaHive/frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
@@ -45,7 +45,7 @@ services:
       # Proxy API calls to the backend so the browser stays same-origin (no CORS needed)
       - type: rewrite
         source: /api/*
-        destination: https://market-rover-api.onrender.com/api/*
+        destination: https://alphahive-api.onrender.com/api/*
       # SPA fallback — send everything else to index.html
       - type: rewrite
         source: /*

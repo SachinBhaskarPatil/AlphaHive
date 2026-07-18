@@ -1,5 +1,0 @@
-cleanup_legacy_services.ps1
-cleanup_legacy_services.sh
-investbrand/frontend/package-lock.json
-investbrand/frontend/package.json
-pledge_rover/frontend/src/pages/PromoterProfile.jsx
