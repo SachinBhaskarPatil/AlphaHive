@@ -536,17 +536,6 @@
         "status": "active"
       },
       {
-        "timestamp": "2026-07-06T18:13:06.326434",
-        "ticker": "TCS.NS",
-        "current_price": 2057.60009765625,
-        "target_price": 2325.07,
-        "target_date": "2026-12-31",
-        "strategy": "Median Strategy",
-        "confidence": "High",
-        "years_tested": 3,
-        "status": "active"
-      },
-      {
         "timestamp": "2026-07-06T18:05:06.457024",
         "ticker": "ITC.NS",
         "current_price": 288.25,
@@ -588,6 +577,28 @@
         "ticker": "^BSESN",
         "current_price": 77186.8671875,
         "target_price": 84313.16,
+        "target_date": "2026-12-31",
+        "strategy": "Median Strategy",
+        "confidence": "High",
+        "years_tested": 3,
+        "status": "active"
+      },
+      {
+        "timestamp": "2026-07-18T09:25:36.197416",
+        "ticker": "TCS.NS",
+        "current_price": 2269.0,
+        "target_price": 2599.51,
+        "target_date": "2026-12-31",
+        "strategy": "Median Strategy",
+        "confidence": "High",
+        "years_tested": 3,
+        "status": "active"
+      },
+      {
+        "timestamp": "2026-07-18T09:29:00.099093",
+        "ticker": "LTF.NS",
+        "current_price": 310.04998779296875,
+        "target_price": 323.18,
         "target_date": "2026-12-31",
         "strategy": "Median Strategy",
         "confidence": "High",
