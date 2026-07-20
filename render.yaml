@@ -23,6 +23,9 @@ services:
         fromDatabase:
           name: alphahive-db
           property: connectionString
+      # Google OAuth callback — must match the frontend URL and Google Console authorized URIs
+      - key: GOOGLE_REDIRECT_URI
+        value: https://alphahive-web.onrender.com/auth/callback
       # Secrets — set these values in the Render dashboard (sync:false keeps them out of git)
       - key: OPENAI_API_KEY
         sync: false
