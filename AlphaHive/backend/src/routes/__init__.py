@@ -1,4 +1,4 @@
-"""Modular routes package for the Market-Rover API."""
+"""Modular routes package for the AlphaHive API."""
 from fastapi import APIRouter
 from src.routes.auth import router as auth_router
 from src.routes.analyze import router as analyze_router

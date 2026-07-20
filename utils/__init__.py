@@ -1,3 +1,3 @@
 """
-Utility modules for Market-Rover 2.0
+Utility modules for AlphaHive 2.0
 """

@@ -1,5 +1,5 @@
 """
-Unified Operational Support Agent (SRE) for Market-Rover (Python).
+Unified Operational Support Agent (SRE) for AlphaHive (Python).
 Analyzes system errors and provides mitigation strategies.
 """
 import json
@@ -10,7 +10,7 @@ from config import LLM_PROVIDER, OPENAI_API_KEY, GOOGLE_API_KEY, LLM_FLASH_MODEL
 
 logger = logging.getLogger(__name__)
 
-_DIAGNOSTIC_PROMPT = """You are the Market-Rover Operational Support Agent (SRE).
+_DIAGNOSTIC_PROMPT = """You are the AlphaHive Operational Support Agent (SRE).
 A system error has occurred in the {context} phase.
 
 ERROR DETAILS:

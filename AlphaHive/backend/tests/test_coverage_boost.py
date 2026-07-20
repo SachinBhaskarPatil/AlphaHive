@@ -52,7 +52,7 @@ def test_auth_callback_dev_bypass():
     assert res.status_code == 200
     data = res.json()
     # dev bypass in server.py returns the hardcoded SB handle
-    assert "market-rover.com" in data["handle"]
+    assert "alphahive.com" in data["handle"]
     assert data["provider"] == "Google"
 
 

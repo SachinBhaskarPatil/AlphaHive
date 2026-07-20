@@ -1,5 +1,5 @@
 """
-Batch Tools - Parallel processing for Market Rover agents.
+Batch Tools - Parallel processing for AlphaHive agents.
 Replaces single-stock tools with optimized batch operations.
 """
 import concurrent.futures

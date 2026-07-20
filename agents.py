@@ -1,5 +1,5 @@
 """
-Agent definitions for Market Rover system.
+Agent definitions for AlphaHive system.
 
 .. note::
     If you modify any agent roles or goals, please update `AI_AGENTS.md`.
@@ -364,7 +364,7 @@ def create_sre_support_agent():
     llm = get_flash_llm()
     return Agent(
         role="SRE Support Sentinel",
-        goal="Ensure 99.9% uptime and optimal latency of the Market-Rover ecosystem.",
+        goal="Ensure 99.9% uptime and optimal latency of the AlphaHive ecosystem.",
         backstory=(
             "You are the sentinel of infrastructure. You monitor token costs, build logs, and "
             "deployment latency. You follow Rule #7 and #8. You are 'Timezone-Aware' of your "

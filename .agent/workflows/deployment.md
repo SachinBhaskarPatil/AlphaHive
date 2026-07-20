@@ -1,10 +1,10 @@
 ---
-description: Pre-flight checklist and command flow for deploying to Google Cloud Run
+description: Pre-flight checklist and command flow for deploying to Render
 ---
 
 # Deployment Workflow
 
-Google Cloud Run auto-deploys via GitHub Actions (`.github/workflows/market_rover_deploy.yml`) when changes are pushed to `main`. The workflow runs backend tests, builds images via Cloud Build, and deploys the `market-rover-api` and `market-rover-ui` services. This checklist ensures that push is safe.
+AlphaHive auto-deploys on **Render** via `render.yaml` when changes are pushed to the connected branch (`main`). Services: `alphahive-api`, `alphahive-web`, and `alphahive-db`. GitHub Actions (`.github/workflows/ci.yml`) runs tests. This checklist ensures that push is safe.
 
 1.  **⏱️ Start Timer**
     - [ ] Run: `python -m utils.tracking start deployment`
@@ -13,45 +13,23 @@ Google Cloud Run auto-deploys via GitHub Actions (`.github/workflows/market_rove
 2.  **Codebase Integrity & Hygiene**
     - [ ] **Cleanup**: Remove `print()` statements.
     - [ ] **No Dead Code**: Remove commented-out blocks.
-    - [ ] **Secrets Check**: Ensure no API keys in code.
+    - [ ] Secrets stay in Render dashboard / `.env` — never commit `.env`.
 
-3.  **Pre-Flight Safety Check**
-    - [ ] **Dependencies**: Run `pip freeze > requirements.txt` if needed.
-    - [ ] **Imports**: Verify no "local-only" imports.
-    - [ ] **Deps Drift**: If modifying a satellite module that uses shared tools from `rover_tools/`, `utils/`, or `scripts/`, confirm the dependency exists in **that module's own `requirements.txt`**.
-    - [ ] **Startup Integrity**: After installing a satellite's deps, verify the app loads:
-        ```bash
-        python -c "from <module>.backend.src.server import app; print('[OK]')"
-        ```
-    - [ ] **No Connector at Import**: Ensure no `google-cloud-sql-connector` is instantiated at the top-level of any file. This allows build-time imports to pass without credentials.
-    - [ ] **DB Robustness**: Ensure database connection strings use `urllib.parse.quote_plus()` for all credentials (user/password). **MANDATORY**: For Unix sockets, provide only the directory path as the host (e.g., `?host=/cloudsql/conn`).
-    - [ ] **Context Sync**: If modifying a satellite, ensure its `.github/workflows/` includes a `Sync Core Dependencies` step.
+3.  **Local Verification**
+    - [ ] Backend starts: `cd AlphaHive/backend && python src.server` (or `uvicorn src.server:app`).
+    - [ ] Frontend builds: `cd AlphaHive/frontend && npm run build`.
+    - [ ] Backend tests pass: `cd AlphaHive/backend && pytest`.
 
+4.  **Auth / Env Sanity**
+    - [ ] `GOOGLE_REDIRECT_URI` matches `https://alphahive-web.onrender.com/auth/callback`.
+    - [ ] Render secrets set: `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `VITE_GOOGLE_CLIENT_ID`.
 
-4.  **Compilation Check**
-    // turbo
-    - [ ] Run syntax check on all python files:
-      ```powershell
-      python -m py_compile app.py agents.py tasks.py crew.py rover_tools/*.py utils/*.py
-      ```
+5.  **Push & Verify**
+    - [ ] Push to `main`.
+    - [ ] Confirm Render deploy for `alphahive-api` / `alphahive-web` succeeded.
+    - [ ] Confirm CI (`.github/workflows/ci.yml`) is green.
+    - [ ] Open https://alphahive-web.onrender.com/
+    - [ ] Smoke-test login + one portfolio / ticker analysis.
 
-5.  **Documentation Check**
-    - [ ] **Version Scrub**: Ensure no "V4.0" strings.
-    - [ ] **Status**: Ensure badges are accurate.
-
-6.  **Deployment Action**
-    - [ ] **Commit**: `git add .` -> `git commit -m "feat: [Description]"`
-    - [ ] **Push**: `git push origin main`
-
-7.  **Emergency Override Protocol (Hotfix)**
-    - *Scenario*: **P0 Incident** (Site Down).
-    - *Action*: You may skip Steps 4 & 5 IF < 5 lines + Notify User.
-    - *Metric*: Run: `python -m utils.tracking event emergency_override "Reason for hotfix"`
-
-8.  **Post-Deploy Verification**
-    - [ ] Check the GitHub Actions run for `market_rover_deploy.yml` completed green.
-    - [ ] Open https://market-rover-ui-9514347926.us-central1.run.app/
-    - [ ] Verify the app loads.
-
-9.  **🏁 Stop Timer**
-    - [ ] Run: `python -m utils.tracking stop [SESSION_ID] success`
+6.  **⏱️ End Timer**
+    - [ ] Run: `python -m utils.tracking end <SESSION_ID>`

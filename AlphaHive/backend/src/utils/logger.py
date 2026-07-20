@@ -3,7 +3,7 @@ import sys
 
 def get_logger(name):
     """
-    Returns a configured UTF-8 logger for the Market-Rover ecosystem.
+    Returns a configured UTF-8 logger for the AlphaHive ecosystem.
     Strictly [Emoji-Free] and Python 3.13 compatible.
     """
     logger = logging.getLogger(name)

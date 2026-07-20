@@ -1,4 +1,4 @@
--- Market-Rover v5.0 — PostgreSQL Schema Migrations
+-- AlphaHive v5.0 — PostgreSQL Schema Migrations
 -- Cloud SQL instance: market-rover:us-central1:market-rover-db
 -- Database: market_rover
 -- Run order: top to bottom (all statements are idempotent via IF NOT EXISTS / ON CONFLICT)

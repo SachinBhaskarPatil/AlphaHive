@@ -1,5 +1,5 @@
 """
-Configuration settings for Market Rover system.
+Configuration settings for AlphaHive system.
 """
 import os
 from pathlib import Path
@@ -85,11 +85,11 @@ def resolve_ticker(symbol: str) -> str:
 SENTIMENT_POSITIVE_THRESHOLD = 0.3
 SENTIMENT_NEGATIVE_THRESHOLD = -0.3
 
-# Parallel Execution Settings (Market-Rover 2.0)
+# Parallel Execution Settings (AlphaHive 2.0)
 MAX_PARALLEL_STOCKS = int(os.getenv("MAX_PARALLEL_STOCKS", "5"))
 RATE_LIMIT_DELAY = float(os.getenv("RATE_LIMIT_DELAY", "1.0"))
 
-# Web UI Settings (Market-Rover 2.0)
+# Web UI Settings (AlphaHive 2.0)
 if os.getenv("K_SERVICE"):
     UPLOAD_DIR = Path("/tmp/uploads")
 else:

@@ -1,5 +1,5 @@
-# AlphaHive / Market-Rover Backend — Python Dependencies
-# Install from repo root: pip install -r market_rover/backend/requirements.txt
+# AlphaHive Backend — Python Dependencies
+# Install from repo root: pip install -r AlphaHive/backend/requirements.txt
 # Also requires repo-root packages from ../../requirements.txt for full agent tooling.
 
 # --- Web Framework ---

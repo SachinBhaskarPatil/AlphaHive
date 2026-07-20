@@ -1,5 +1,5 @@
 ---
-description: Standard workflow for implementing new features in Market-Rover
+description: Standard workflow for implementing new features in AlphaHive
 ---
 
 # Feature Development Workflow
@@ -13,7 +13,7 @@ Follow this workflow for every new feature request to ensure consistency and qua
 2.  **Strategic Planning & Impact Analysis**
     - [ ] **Necessity Check**:
         - "Does this feature solve a generic problem or a specific user need?"
-        - Verify it fits the "Market-Rover" core mission (Stock Intelligence).
+        - Verify it fits the "AlphaHive" core mission (Stock Intelligence).
     - [ ] **Duplication Audit**:
         - Search the codebase (`grep_search`) to ensure this logic doesn't already exist in another form (e.g., in `rover_tools/` or `utils/`).
     - [ ] **Architecture Fit**:

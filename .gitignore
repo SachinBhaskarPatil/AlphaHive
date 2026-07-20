@@ -1,5 +1,5 @@
 # =============================================================================
-# Market-Rover — root .gitignore
+# AlphaHive — root .gitignore
 # =============================================================================
 
 # ----- Python -----
@@ -26,7 +26,7 @@ wheels/
 *.egg
 # Allow frontend source lib directories (not Python lib folders)
 !pledge_rover/frontend/src/lib/
-!market_rover/frontend/src/lib/
+!AlphaHive/frontend/src/lib/
 
 # Virtual environments
 venv/

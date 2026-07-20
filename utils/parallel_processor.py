@@ -1,5 +1,5 @@
 """
-Parallel stock analysis processor for Market-Rover 2.0
+Parallel stock analysis processor for AlphaHive 2.0
 Handles concurrent processing of multiple stocks using ThreadPoolExecutor
 """
 import time

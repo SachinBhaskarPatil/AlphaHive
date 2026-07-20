@@ -1,5 +1,5 @@
 """
-Report visualization utilities for Market-Rover 2.0
+Report visualization utilities for AlphaHive 2.0
 Generates interactive charts and exports to multiple formats
 """
 import html as html_module

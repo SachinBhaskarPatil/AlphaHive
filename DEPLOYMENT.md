@@ -1,14 +1,15 @@
-# Deploying Market-Rover (v5 Stack)
+# Deploying AlphaHive (v5 Stack)
 
-Market-Rover v5 is a decoupled application:
+AlphaHive v5 is a decoupled application:
 
-- **Backend** — FastAPI + LangGraph API (`market_rover/backend`), runs on port `8080`.
-- **Frontend** — React 19 + Vite SPA (`market_rover/frontend`), built to static files and served via nginx.
+- **Backend** — FastAPI + LangGraph API (`AlphaHive/backend`), runs on port `8080`.
+- **Frontend** — React 19 + Vite SPA (`AlphaHive/frontend`), built to static files and served via nginx.
 - **Shared library** — `rover_tools/`, `utils/`, `config.py`, `agents.py`, `crew_engine.py` at the repo root, consumed by the backend agent nodes and automation scripts.
 
-Production is hosted on **Google Cloud Run** (project `market-rover`, region `us-central1`) and deployed automatically via **GitHub Actions**.
+Production is hosted on **[Render](https://render.com/)** via `render.yaml` (`alphahive-web`, `alphahive-api`, `alphahive-db`).
 
-🌐 **Live UI:** https://market-rover-ui-9514347926.us-central1.run.app/
+🌐 **Live UI:** https://alphahive-web.onrender.com/  
+🔌 **API:** https://alphahive-api.onrender.com/
 
 ---
 
@@ -17,7 +18,7 @@ Production is hosted on **Google Cloud Run** (project `market-rover`, region `us
 1. Python 3.13
 2. Node.js 20+
 3. Google Gemini API key ([get one here](https://makersuite.google.com/app/apikey))
-4. Market-Rover code (this repository)
+4. AlphaHive code (this repository)
 
 ---
 
@@ -26,7 +27,7 @@ Production is hosted on **Google Cloud Run** (project `market-rover`, region `us
 ### 1.1 Backend (FastAPI + LangGraph)
 
 ```bash
-cd market_rover/backend
+cd AlphaHive/backend
 pip install -r requirements.txt
 # Copy the env template and fill in secrets (GOOGLE_API_KEY, DATABASE_URL,
 # GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, JWT_SECRET, ...)
@@ -41,7 +42,7 @@ The API is now available at `http://localhost:8080`.
 In a separate terminal:
 
 ```bash
-cd market_rover/frontend
+cd AlphaHive/frontend
 npm install
 cp .env.example .env
 npm run dev
@@ -52,7 +53,7 @@ The Vite dev server proxies `/api` requests to the backend on port `8080`.
 ### 1.3 Docker (optional, full stack)
 
 ```bash
-cd market_rover
+cd AlphaHive
 docker-compose up --build
 ```
 
@@ -60,26 +61,19 @@ This brings up the backend, frontend, and a local PostgreSQL instance.
 
 ---
 
-## 2. Production Deployment (Google Cloud Run)
+## 2. Production Deployment (Render)
 
-Deployment is fully automated through GitHub Actions — there are no manual `gcloud` steps required for the main app.
+Production is defined in root `render.yaml` and auto-redeploys on each push to the connected branch (`main`).
 
-### 2.1 How It Works
+### 2.1 Services
 
-The workflow at `.github/workflows/market_rover_deploy.yml` triggers when you push to `main` with changes under:
+| Service | Render name | URL |
+|---------|-------------|-----|
+| Frontend (static) | `alphahive-web` | https://alphahive-web.onrender.com/ |
+| Backend (FastAPI) | `alphahive-api` | https://alphahive-api.onrender.com/ |
+| Database | `alphahive-db` | (internal Postgres) |
 
-- `market_rover/**`, or
-- any of the shared root libraries (`rover_tools/`, `utils/`, `scripts/`, `agents.py`, `config.py`).
-
-On trigger, the pipeline:
-
-1. Runs the **backend test suite** (with the coverage gate).
-2. Builds the backend and frontend images via **Cloud Build**.
-   - Backend Dockerfile: `market_rover/Dockerfile`
-   - Frontend Dockerfile: `market_rover/frontend/Dockerfile`
-3. Deploys two **Cloud Run** services in `us-central1`:
-   - `market-rover-api` — FastAPI backend
-   - `market-rover-ui` — React frontend (nginx)
+The frontend proxies `/api/*` to `alphahive-api` (see `render.yaml` routes).
 
 ### 2.2 Deploying
 
@@ -89,67 +83,51 @@ git commit -m "feat: your change"
 git push origin main
 ```
 
-That's it — pushing to `main` kicks off tests, build, and Cloud Run deploy.
+Render rebuilds `alphahive-api` and `alphahive-web` automatically.
 
-### 2.3 Required GitHub Secrets
+### 2.3 Required Render Secrets
 
-Configure these in **Repo → Settings → Secrets and variables → Actions**:
+Set these in the **Render dashboard** (Environment → secrets; `sync: false` in `render.yaml`):
 
-| Secret | Purpose |
-|--------|---------|
-| `GCP_SA_KEY` | GCP service-account key for Cloud Build / Cloud Run deploy |
-| `OPENAI_API_KEY` | LLM API access |
-| `PROD_DB_PASSWORD` | Cloud SQL database password |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID (backend auth) |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret (backend auth) |
-| `JWT_SECRET` | Signing secret for backend-issued JWTs |
-| `CODECOV_TOKEN` | Upload backend coverage reports |
+| Secret | Service | Purpose |
+|--------|---------|---------|
+| `OPENAI_API_KEY` | `alphahive-api` | LLM access |
+| `GOOGLE_CLIENT_ID` | `alphahive-api` | Google OAuth |
+| `GOOGLE_CLIENT_SECRET` | `alphahive-api` | Google OAuth |
+| `JWT_SECRET` | `alphahive-api` | JWT signing (if used) |
+| `VITE_GOOGLE_CLIENT_ID` | `alphahive-web` | Frontend OAuth client ID |
+
+`GOOGLE_REDIRECT_URI` is set in `render.yaml` to:
+
+`https://alphahive-web.onrender.com/auth/callback`
+
+(also add this URI in Google Cloud Console → OAuth client → Authorized redirect URIs)
+
+### 2.4 CI
+
+GitHub Actions (`.github/workflows/ci.yml`) runs tests/coverage on push. Deploy itself is handled by Render, not Cloud Run.
 
 ---
 
-## 3. Other Microservices (Cloud Run)
+## 3. Related Modules (optional)
 
-Beyond the Market-Rover backend and frontend, the platform runs specialized microservices for gamification and AI council scanning.
-
-### 3.1 Services List
-1. **InvestBrand API**: Node.js/Express service for the "Brand to Stock" game.
-2. **Pledge-Rover**: Python/FastAPI service for the AI Governance Council.
-
-### 3.2 Automatic Deployment
-These services are automatically built and deployed via **GitHub Actions** when changes are pushed to their respective directories:
-- `investbrand/` -> Deploy to Cloud Run (Node 20)
-- `pledge_rover/` -> Deploy to Cloud Run (Python 3.13)
-
-### 3.3 Manual Deployment (Optional)
-If you need to deploy manually from your local machine:
-```bash
-# Deploy InvestBrand
-cd investbrand/backend
-gcloud builds submit --tag gcr.io/PROJECT_ID/investbrand-api
-gcloud run deploy investbrand-api --image gcr.io/PROJECT_ID/investbrand-api
-
-# Deploy Pledge-Rover
-cd pledge_rover
-gcloud builds submit --tag gcr.io/PROJECT_ID/pledge-rover
-gcloud run deploy pledge-rover --image gcr.io/PROJECT_ID/pledge-rover
-```
+Beyond the AlphaHive backend and frontend, the repo may include satellite modules (e.g. InvestBrand, Pledge-Rover). Deploy those separately if present.
 
 ---
 
 ## 4. Troubleshooting
 
-### Issue: Deploy Workflow Fails on Tests
-- Run the backend suite locally: `cd market_rover/backend && pytest`.
+### Issue: CI Fails on Tests
+- Run the backend suite locally: `cd AlphaHive/backend && pytest`.
 - Fix failures and confirm the coverage gate passes before re-pushing.
 
-### Issue: Container Fails to Start on Cloud Run
-- Ensure the backend binds to `0.0.0.0:8080` (Cloud Run injects `PORT=8080`).
-- Verify no `google-cloud-sql-connector` is instantiated at import time (build-time imports must pass without credentials).
-- Check the Cloud Run **Logs** tab for the failing service.
+### Issue: Service Fails to Start on Render
+- Ensure the backend binds to `0.0.0.0:$PORT` (Render injects `PORT`).
+- Check the Render **Logs** tab for `alphahive-api` / `alphahive-web`.
 
 ### Issue: API Key / Auth Not Working
-- Confirm `GOOGLE_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `JWT_SECRET` are set as Cloud Run env vars / GitHub secrets.
-- Verify the OAuth redirect URI matches the deployed frontend URL.
+- Confirm `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` are set on `alphahive-api`.
+- Verify the OAuth redirect URI is exactly `https://alphahive-web.onrender.com/auth/callback`.
 
 ### Issue: Security Vulnerabilities
 ```bash
@@ -163,22 +141,22 @@ pip install --upgrade PACKAGE_NAME
 ## 5. Cost Estimate
 
 **Free Tier (Recommended for Personal Use)**:
-- Google Cloud Run: **$0** (scale-to-zero, generous free tier)
-- Gemini API: **FREE** (light usage)
-- Total: **$0/month** ✅
+- Render (`alphahive-web` + `alphahive-api` + `alphahive-db`): **$0** (free plan)
+- Gemini / OpenAI: depends on usage
+- Total: **$0/month** on Render free tier ✅
 
 **Paid Tier (If Scaling)**:
-- Cloud Run: ~$5-15/month (sustained traffic / higher CPU-memory)
-- Gemini API: ~$1-5/month (light-moderate usage)
+- Render paid plans: see [Render pricing](https://render.com/pricing)
+- LLM API: ~$1-5+/month depending on volume
 
 ---
 
 ## 6. Post-Deploy Verification
 
-1. Open https://market-rover-ui-9514347926.us-central1.run.app/
+1. Open https://alphahive-web.onrender.com/
 2. Verify the frontend loads and the login flow completes.
 3. Run a sample ticker analysis to confirm the backend and LangGraph pipeline respond.
 
 ---
 
-**Market-Rover v5 — deployed to Google Cloud Run. 🚀**
+**AlphaHive v5 — live on Render. 🚀**

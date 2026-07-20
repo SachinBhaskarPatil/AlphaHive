@@ -1,5 +1,5 @@
 """
-Logging infrastructure for Market-Rover 2.0
+Logging infrastructure for AlphaHive 2.0
 Provides structured logging with rotation and multiple log levels
 """
 import logging
@@ -15,12 +15,12 @@ LOG_DIR.mkdir(exist_ok=True)
 # Log configuration
 LOG_FORMAT = "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
-LOG_FILE = LOG_DIR / "market_rover.log"
+LOG_FILE = LOG_DIR / "alphahive.log"
 MAX_BYTES = 10 * 1024 * 1024  # 10MB per file
 BACKUP_COUNT = 7  # Keep 7 days of logs
 
 
-def get_logger(name: str = "market_rover") -> logging.Logger:
+def get_logger(name: str = "alphahive") -> logging.Logger:
     """
     Get a configured logger instance.
     

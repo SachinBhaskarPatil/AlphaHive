@@ -1,4 +1,4 @@
-# Contributing to Market-Rover
+# Contributing to AlphaHive
 
 Welcome! We love contributions. Here’s how to set up your local environment and ship code safely.
 
@@ -6,8 +6,8 @@ Welcome! We love contributions. Here’s how to set up your local environment an
 
 1.  **Clone & Environment**
     ```bash
-    git clone https://github.com/SankarGaneshb/Market-Rover.git
-    cd Market-Rover
+    git clone https://github.com/SankarGaneshb/AlphaHive.git
+    cd AlphaHive
     python -m venv .venv
     # Windows:
     .\.venv\Scripts\activate

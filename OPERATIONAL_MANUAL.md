@@ -1,5 +1,5 @@
 
-# 🛠️ Market-Rover Operational Manual
+# 🛠️ AlphaHive Operational Manual
 
 This guide covers how to handle operational issues that require manual intervention. The system is designed to heal itself from minor glitches (retries), but some issues demand a human touch.
 
@@ -9,7 +9,7 @@ This guide covers how to handle operational issues that require manual intervent
 **Status**: Partially Automated (3 Retries)
 **Symptom**: "Invalid response from LLM call" or "ValueError" in logs.
 **Action**:
-1.  **Check Logs**: Go to `logs/market_rover.log`.
+1.  **Check Logs**: Go to `logs/alphahive.log`.
 2.  **Verify Quota**: Ensure your Gemini API key hasn't hit its rate limit or monthly quota.
 3.  **Manual Restart**: If retries fail 3 times, the API might be down or blocked.
     *   Wait 15 minutes.
@@ -44,7 +44,7 @@ This guide covers how to handle operational issues that require manual intervent
 **Cause**: The external NSE data source is down, busy, or blocking requests (common during off-hours).
 **Action**:
 1.  No action required usually; the system retries automatically (3 times).
-2.  If persistent (>24 hours), check `logs/market_rover.log` for "API Down" patterns.
+2.  If persistent (>24 hours), check `logs/alphahive.log` for "API Down" patterns.
 3.  **Mine Logs**: Run `python scripts/mine_logs.py` to see failure timestamps and frequency.
 
 ### 5. Automated Workflow Failures
@@ -58,7 +58,7 @@ This guide covers how to handle operational issues that require manual intervent
 3.  **Backtest**:
     *   If data is missing for `batch_backtester.py`, verify `yfinance` is up.
 
-### 6. CI/CD & Build Failures (Market-Rover Build)
+### 6. CI/CD & Build Failures (AlphaHive Build)
 **Status**: Managed by SRE Support Sentinel (Autonomous Response)
 **Symptom**: GitHub Actions red-dot on `main` or `HIL-Rover`.
 **Safeguard**:
@@ -92,7 +92,7 @@ This guide covers how to handle operational issues that require manual intervent
 
 Please note what is **NOT** covered by the automated retry system:
 
-*   **React Web UI Crashes**: If the web page freezes or shows an error boundary / blank screen, that is a frontend error. Refresh the page (`F5`); if it persists, check the browser console and the `market-rover-api` backend logs.
+*   **React Web UI Crashes**: If the web page freezes or shows an error boundary / blank screen, that is a frontend error. Refresh the page (`F5`); if it persists, check the browser console and the `alphahive-api` backend logs.
 *   **External CI/CD**: Errors in GitHub Actions or Docker deployment pipelines are outside this application's control. Check the GitHub "Actions" tab.
 *   **Infrastructure**: If the server runs out of memory (OOM) or disk space, the application will crash. This requires system-level monitoring.
 

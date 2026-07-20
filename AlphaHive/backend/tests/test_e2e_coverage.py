@@ -224,7 +224,7 @@ def test_brain_agents():
     r = client.get("/api/brain/agents")
     assert r.status_code == 200
     assert r.json()["counts"]["total"] == 4
-    assert len(client.get("/api/brain/agents", params={"platform": "Market-Rover"}).json()["agents"]) == 4
+    assert len(client.get("/api/brain/agents", params={"platform": "AlphaHive"}).json()["agents"]) == 4
     assert len(client.get("/api/brain/agents", params={"platform": "Other"}).json()["agents"]) == 0
 
 

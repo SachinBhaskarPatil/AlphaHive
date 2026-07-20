@@ -90,7 +90,7 @@ Run this checklist before marking any significant task as "Completed".
     - [ ] Example: `postgresql://{quote(user)}:{quote(pass)}@/dbname?host=/cloudsql/conn`. Use `asyncpg` or `sqlalchemy` (async).
     - [ ] Verify that database credentials are never required to simply *import* the server.
 
-8.  **Satellite Build Integrity (Market-Rover v5 Standard)**
+8.  **Satellite Build Integrity (AlphaHive v5 Standard)**
     - [ ] **EXPLICIT SYNC**: If a satellite module uses root-level tools (e.g., `rover_tools`, `utils`), ensure the CI workflow has a `Sync Core Dependencies` step using `cp -r` to move those tools into the build context.
     - [ ] **DOCKERFILE COPY**: Verify the satellite's `Dockerfile` has explicit `COPY rover_tools/ ./rover_tools/` commands and sets `ENV PYTHONPATH=/app`.
     - [ ] **DEEP IMPORT VERIFICATION**: Run `python scripts/build_integrity_check.py` and verify it passes the "Deep Import" stage for all rovers.

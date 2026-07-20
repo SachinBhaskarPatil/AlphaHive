@@ -9,7 +9,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List
-from src.market_rover_graph import create_market_rover_graph
+from src.alphahive_graph import create_alphahive_graph
 from src.utils.logger import get_logger
 from src.utils.db_manager import db
 from src.utils.json_sanitize import json_safe
@@ -18,7 +18,7 @@ router = APIRouter()
 logger = get_logger(__name__)
 
 # Graph is compiled once at import time
-_graph = create_market_rover_graph()
+_graph = create_alphahive_graph()
 
 # In-memory task store (should be Redis for horizontal scaling, but using global dict for now)
 active_tasks = {}

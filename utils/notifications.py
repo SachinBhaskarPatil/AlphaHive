@@ -1,6 +1,6 @@
 
 """
-Notification Manager for Market-Rover.
+Notification Manager for AlphaHive.
 Handles sending alerts and reports via Email (SMTP).
 """
 import smtplib

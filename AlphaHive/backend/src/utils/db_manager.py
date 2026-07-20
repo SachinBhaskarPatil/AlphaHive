@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 
 class DBManager:
     """
-    Handles async connections to the Market-Rover PostgreSQL instance.
+    Handles async connections to the AlphaHive PostgreSQL instance.
     Supports user activity tracking, social loops, and agent memory.
     """
 

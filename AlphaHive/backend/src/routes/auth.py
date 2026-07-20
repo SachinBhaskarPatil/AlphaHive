@@ -61,7 +61,7 @@ async def google_callback(request: Request):
     # Dev bypass
     if code == "mock_code":
         return {
-            "handle": "dev.analyst@market-rover.com",
+            "handle": "dev.analyst@alphahive.com",
             "name": "Dev Analyst",
             "picture": None,
             "provider": "Google",

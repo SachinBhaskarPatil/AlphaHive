@@ -1,9 +1,9 @@
-# 🔍 Market-Rover - AI Stock Intelligence Platform for Indian Markets - Your personal quant researcher
+# 🔍 AlphaHive - AI Stock Intelligence Platform for Indian Markets - Your personal quant researcher
 
 **Multi-agent AI that reads your Indian equity portfolio like a research desk – portfolios, heatmaps, institutional flows, and forecasts in one place.**
 
 > [!TIP]
-> **NEW TO MARKET-ROVER?** Check out our [User Guide](USER_GUIDE.md) for a full onboarding to our AI Agents and Shadow Analysis tools.
+> **NEW TO ALPHAHIVE?** Check out our [User Guide](USER_GUIDE.md) for a full onboarding to our AI Agents and Shadow Analysis tools.
 
 **Your complete toolkit for smart investing decisions powered by cutting-edge AI**
 
@@ -13,14 +13,14 @@
 ![Status](https://img.shields.io/badge/Status-Production-brightgreen)
 ![Process Efficiency](https://img.shields.io/badge/Process%20Efficiency-82.6%25-blue)
 
-## Why Market-Rover?
+## Why AlphaHive?
 
 - Built **for Indian markets**: Nifty, Sensex, sector indices, NSE symbols, and block deals – not generic US-only tooling.
 - **Enterprise v5 Stack**: Decoupled **FastAPI Backend** and **React 19 (Vite) Frontend** for maximum performance and scalability.
 - **LangGraph Intelligence**: 10+ specialized nodes orchestrated via **Gemini 2.0-Flash** for news, sentiment, seasonality, MTC technicals, and forensic signals.
-- **Production-ready**: Hosted on Google Cloud Run with unified **PostgreSQL (Cloud SQL)** and CI/CD coverage gates (70%).
+- **Production-ready**: Hosted on **[Render](https://alphahive-web.onrender.com/)** (`alphahive-web` + `alphahive-api` + Postgres) with CI/CD coverage gates (70%).
 
-🌐 **Live v5 UI:** https://market-rover-ui-9514347926.us-central1.run.app/
+🌐 **Live UI:** https://alphahive-web.onrender.com/
 
 ---
 
@@ -35,7 +35,7 @@
 
 #### 1. Backend (FastAPI)
 ```bash
-cd market_rover/backend
+cd AlphaHive/backend
 pip install -r requirements.txt
 # Set GOOGLE_API_KEY and DATABASE_URL in .env
 python src/server.py
@@ -43,7 +43,7 @@ python src/server.py
 
 #### 2. Frontend (React)
 ```bash
-cd market_rover/frontend
+cd AlphaHive/frontend
 npm install
 npm run dev
 ```
@@ -52,7 +52,7 @@ npm run dev
 
 ## ✨ Features at a Glance
 
-Market-Rover is an AI-powered platform with a **comprehensive suite of intelligence tools**:
+AlphaHive is an AI-powered platform with a **comprehensive suite of intelligence tools**:
 
 | Feature | Description | Tech Highlights |
 |---------|-------------|-----------------|
@@ -184,7 +184,7 @@ Visualize the **internal thought process** of your AI agents:
 
 ### Multi-Agent AI System
 
-Market-Rover uses **5 specialized AI agents** orchestrated by CrewAI:
+AlphaHive uses **5 specialized AI agents** orchestrated by CrewAI:
 
 ```mermaid
 graph TD
@@ -277,14 +277,14 @@ graph TD
 
 ## 🔐 Security Features
 
-Market-Rover includes enterprise-grade security:
+AlphaHive includes enterprise-grade security:
 
 | Feature | Implementation | Status |
 |---------|---------------|--------|
 | **Input Sanitization** | Regex validation, injection prevention | ✅ Active |
 | **Rate Limiting** | 20-30 requests/minute per features | ✅ Active |
 | **Investment Disclaimer** | Bottom status bar, always visible | ✅ Active |
-| **Secure API Keys** | Environment variables, Cloud Run secrets | ✅ Active |
+| **Secure API Keys** | Environment variables, Render secrets | ✅ Active |
 | **Timezone Handling** | Project-wide timezone-aware operations | ✅ Active |
 
 **Security Score:** 100/100 🟢
@@ -306,7 +306,7 @@ Market-Rover includes enterprise-grade security:
 
 | Service | Usage | Monthly Cost |
 |---------|-------|--------------|
-| Google Cloud Run | Hosting (scale-to-zero) | **$0** |
+| Render (Web + API) | Hosting (free tier) | **$0** |
 | Gemini 1.5 Flash | <400K tokens/day | **$0** |
 | yfinance | Stock data | **$0** |
 | Newspaper3k | News scraping | **$0** |
@@ -321,7 +321,7 @@ Market-Rover includes enterprise-grade security:
 
 **If Exceeding Free Tier:**
 - Gemini Paid: ~$1-5/month (500K+ tokens/day)
-- Cloud Run: ~$5-15/month (sustained traffic / higher CPU-memory)
+- Render: ~$7+/month (if upgrading off free tier)
 
 ---
 
@@ -351,15 +351,15 @@ Market-Rover includes enterprise-grade security:
 ## 📁 Project Structure
 
 ```
-Market-Rover/
-├── market_rover/               # v5 Cloud-Native application
+AlphaHive/
+├── AlphaHive/               # v5 Cloud-Native application
 │   ├── Dockerfile                 # Backend image (FastAPI + LangGraph)
 │   ├── docker-compose.yml         # Local dev: backend + frontend + postgres
 │   ├── backend/                   # FastAPI + LangGraph API service
 │   │   ├── requirements.txt          # Backend Python dependencies
 │   │   └── src/
 │   │       ├── server.py                # FastAPI entrypoint (python src/server.py, port 8080)
-│   │       ├── market_rover_graph.py    # 10-node parallel LangGraph
+│   │       ├── alphahive_graph.py       # 10-node parallel LangGraph
 │   │       ├── agents/                  # Async agent nodes
 │   │       ├── routes/                  # Modular API routers
 │   │       └── utils/                   # DB manager, logger, helpers
@@ -390,7 +390,8 @@ Market-Rover/
 ├── requirements.txt            # Root shared-library dependencies
 ├── .env.example                # Environment template
 │
-├── .github/workflows/          # CI/CD (market_rover_deploy.yml → Cloud Run)
+├── render.yaml                 # Render blueprint (alphahive-web + alphahive-api + DB)
+├── .github/workflows/          # CI (tests / coverage)
 ├── reports/                    # Intelligence reports
 ├── logs/                       # Application logs
 └── metrics/                    # Performance metrics
@@ -419,7 +420,7 @@ The FastAPI backend listens on port `8080` by default (`python src/server.py`); 
 
 ### 🔐 Google Login & Authentication (Production)
 
-Authentication is handled by the **FastAPI backend** via **Google OAuth** and signed JWTs. Configure the following environment variables (locally in the backend `.env`, and as Cloud Run / GitHub secrets in production):
+Authentication is handled by the **FastAPI backend** via **Google OAuth** and signed JWTs. Configure the following environment variables (locally in the backend `.env`, and as Render / GitHub secrets in production):
 
 ```bash
 GOOGLE_CLIENT_ID=your-google-client-id
@@ -497,7 +498,7 @@ pip install lxml lxml_html_clean
 
 ## 📚 Documentation
 
-- `DEPLOYMENT.md` - Local dev & Google Cloud Run deployment guide
+- `DEPLOYMENT.md` - Local dev & Render deployment guide
 - `SECURITY_FIXES_SUMMARY.md` - Security implementation details
 - `SESSION_SUMMARY_DEC22.md` - Latest development session
 - `FINAL_AUDIT_CHECKLIST.md` - Comprehensive audit report
@@ -526,26 +527,26 @@ pip install lxml lxml_html_clean
 ### Local Development
 ```bash
 # Backend (FastAPI + LangGraph)
-cd market_rover/backend
+cd AlphaHive/backend
 pip install -r requirements.txt
 python src/server.py            # http://localhost:8080
 
 # Frontend (React + Vite) — separate terminal
-cd market_rover/frontend
+cd AlphaHive/frontend
 npm install
 npm run dev
 ```
 
-### Production (Google Cloud Run via GitHub Actions)
+### Production (Render)
 
-1. Push code to `main` with changes under `market_rover/` (or shared root libs).
-2. The `.github/workflows/market_rover_deploy.yml` workflow runs backend tests, builds images via Cloud Build, and deploys to Cloud Run.
-3. Two services are deployed: `market-rover-api` (backend) and `market-rover-ui` (frontend).
-4. Required GitHub secrets: `GCP_SA_KEY`, `OPENAI_API_KEY`, `PROD_DB_PASSWORD`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `JWT_SECRET`, `CODECOV_TOKEN`.
+1. Push code to `main` — Render auto-deploys services defined in `render.yaml`.
+2. Services: `alphahive-api` (FastAPI backend) and `alphahive-web` (React frontend), plus `alphahive-db` (Postgres).
+3. Set secrets in the Render dashboard: `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `JWT_SECRET` (and `VITE_GOOGLE_CLIENT_ID` on the web service).
+4. Google OAuth redirect URI must be: `https://alphahive-web.onrender.com/auth/callback`
 
-**Current Production:** https://market-rover-ui-9514347926.us-central1.run.app/
+**Current Production:** https://alphahive-web.onrender.com/
 
-See `DEPLOYMENT.md` for the full guide.
+See `DEPLOYMENT.md` and `render.yaml` for the full guide.
 
 ---
 
@@ -560,7 +561,7 @@ This is a personal project, but feel free to:
 
 ## ⚠️ Disclaimer
 
-**Market-Rover is for informational purposes only.** Not financial advice. Past performance ≠ future results. Consult a qualified advisor. No liability for losses. By using this app, you accept these terms.
+**AlphaHive is for informational purposes only.** Not financial advice. Past performance ≠ future results. Consult a qualified advisor. No liability for losses. By using this app, you accept these terms.
 
 ---
 
@@ -586,21 +587,21 @@ Personal use. Ensure compliance with data source terms of service:
 
 ---
 
-**Market-Rover** - Your intelligent stock companion 🚀
+**AlphaHive** - Your intelligent stock companion 🚀
 
-*Last Updated: April 18, 2026 (v5 Cloud-Native Migration)*
+*Last Updated: July 20, 2026 (AlphaHive rebrand)*
 
 ---
 
 ## ⚠️ Investment Disclaimer
 
-**Market-Rover is for informational and educational purposes only.**
+**AlphaHive is for informational and educational purposes only.**
 
 - This application does NOT provide investment, financial, legal, or tax advice.
 - All analyses, forecasts, and recommendations are automated and may be inaccurate.
 - Past performance does not guarantee future results.
 - You should consult with a qualified financial advisor before making investment decisions.
-- The creators of Market-Rover assume no liability for financial losses.
+- The creators of AlphaHive assume no liability for financial losses.
 - By using this application, you acknowledge these risks and agree to use at your own discretion.
 
 **NSE Data Disclaimer:**

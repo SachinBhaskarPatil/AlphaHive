@@ -1,5 +1,5 @@
 """
-Security utilities for Market-Rover
+Security utilities for AlphaHive
 Handles input validation and sanitization
 """
 import re

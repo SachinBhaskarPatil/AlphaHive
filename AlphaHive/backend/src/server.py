@@ -47,7 +47,7 @@ except ImportError:
 
 # Initialize the Graphite
 app = FastAPI(
-    title="Market-Rover Core API",
+    title="AlphaHive Core API",
     version="5.0.0-LangGraph",
     description="Institutional-grade agentic analysis powered by LangGraph."
 )
@@ -74,7 +74,7 @@ app.include_router(api_router, prefix="/api")
 @app.get("/")
 async def root():
     return {
-        "message": "Market-Rover Intelligence API Gateway",
+        "message": "AlphaHive Intelligence API Gateway",
         "status": "OPERATIONAL",
         "engine": "LangGraph v5.0",
         "llm_provider": LLM_PROVIDER,

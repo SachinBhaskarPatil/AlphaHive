@@ -1,6 +1,6 @@
-# 🤖 Market-Rover Agentic AI Constitution
+# 🤖 AlphaHive Agentic AI Constitution
 
-This document serves as the **Single Source of Truth** for the Agentic AI system within Market Rover. It details the roles, responsibilities, capabilities, and interactions of every agent in the ecosystem.
+This document serves as the **Single Source of Truth** for the Agentic AI system within AlphaHive. It details the roles, responsibilities, capabilities, and interactions of every agent in the ecosystem.
 
 ---
 

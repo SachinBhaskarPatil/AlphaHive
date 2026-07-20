@@ -3,7 +3,7 @@ from operator import add
 
 class AgentState(TypedDict):
     """
-    The state of the Market-Rover Intelligence Graph.
+    The state of the AlphaHive Intelligence Graph.
     This maintains context across nodes and supports parallel execution.
     """
 

@@ -11,9 +11,9 @@ from src.agents.shadow_node import shadow_node
 from src.agents.forensic_node import forensic_node
 from src.agents.reporting_node import reporting_node
 
-def create_market_rover_graph():
+def create_alphahive_graph():
     """
-    Constructs the Market-Rover Intelligence Graph.
+    Constructs the AlphaHive Intelligence Graph.
     Implements a non-linear, parallel, and stateful flow.
     """
     workflow = StateGraph(AgentState)
@@ -59,6 +59,6 @@ def create_market_rover_graph():
     return workflow.compile()
 
 # Example usage:
-# app = create_market_rover_graph()
+# app = create_alphahive_graph()
 # config = {"configurable": {"thread_id": "user_session_123"}}
 # app.invoke({"tickers": ["TCS.NS", "RELIANCE.NS"], "user_id": "test_user"}, config)

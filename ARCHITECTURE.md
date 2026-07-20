@@ -1,6 +1,6 @@
-# Market-Rover Technical Architecture
+# AlphaHive Technical Architecture
 
-This document details the internal architecture of Market-Rover, focusing on its component structure, operational workflows, and multi-agent orchestration.
+This document details the internal architecture of AlphaHive, focusing on its component structure, operational workflows, and multi-agent orchestration.
 
 ---
 
@@ -19,8 +19,8 @@ graph TB
 
     subgraph UserLayer [User Interface Layer]
         direction TB
-        UI[React + Vite Frontend\n(market_rover/frontend)]:::frontend
-        API[FastAPI Backend\n(market_rover/backend)]:::frontend
+        UI[React + Vite Frontend\n(AlphaHive/frontend)]:::frontend
+        API[FastAPI Backend\n(AlphaHive/backend)]:::frontend
         UI --> API
     end
 
@@ -78,7 +78,7 @@ graph TB
 
 ## 2. Automated Workflows (Headless)
 
-In addition to the user-driven loop, Market-Rover runs autonomous jobs on GitHub Actions.
+In addition to the user-driven loop, AlphaHive runs autonomous jobs on GitHub Actions.
 
 ```mermaid
 graph LR
@@ -210,19 +210,19 @@ sequenceDiagram
 
 ## 4. Observability & Logging
 
-Market-Rover maintains a dual-layer observability stack to ensure issues are captured at both the application and logic levels.
+AlphaHive maintains a dual-layer observability stack to ensure issues are captured at both the application and logic levels.
 
 ### 4.1 Log Structure
 
 | Type | Location | Retention | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Application Logs** | `logs/market_rover.log` | 7 Days (Rotated) | Standard `INFO`, `WARNING`, and `ERROR` events from the Python runtime (app startup, API connection failures). |
+| **Application Logs** | `logs/alphahive.log` | 7 Days (Rotated) | Standard `INFO`, `WARNING`, and `ERROR` events from the Python runtime (app startup, API connection failures). |
 | **Crash Metrics** | `metrics/errors_YYYY-MM-DD.jsonl` | Permanent | **Critical**: Detailed JSON objects containing full stack traces, user context, and variable states during a crash. |
 | **Workflow Events** | `metrics/workflow_events_*.jsonl` | Permanent | Tracks high-level logic flows (e.g., "Consistency Check Failed", "Emergency Override"). |
 
 ### 4.2 Debugging Flow
 
-1. **User Reports Issue**: Check `logs/market_rover.log` for the exact time.
+1. **User Reports Issue**: Check `logs/alphahive.log` for the exact time.
 2. **Deep Dive**: If an agent failed, open the corresponding `metrics/errors_*.jsonl` file.
    - Look for `"type": "CrewExecutionError"` or `"type": "AgentException"`.
    - The JSON record will contain the `trace` field with the exact line number.

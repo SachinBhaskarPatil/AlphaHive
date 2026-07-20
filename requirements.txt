@@ -1,4 +1,4 @@
-# Market-Rover Shared Library & CrewAI Dependencies
+# AlphaHive Shared Library & CrewAI Dependencies
 # (Used by the FastAPI backend agent nodes and the automation scripts.
 #  Strictly isolated from Pledge Rover & InvestBrand APIs)
 

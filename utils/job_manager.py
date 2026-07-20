@@ -1,5 +1,5 @@
 """
-Job tracking and management for Market-Rover 2.0
+Job tracking and management for AlphaHive 2.0
 Handles job status, progress tracking, and job lifecycle
 """
 import uuid

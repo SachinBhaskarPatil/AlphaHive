@@ -10,17 +10,17 @@ from src.utils.repo_root import in_repo_root
 router = APIRouter()
 logger = get_logger(__name__)
 
-MARKET_ROVER_AGENTS = [
-    {"id": "A", "role": "Portfolio Manager", "emoji": "📁", "platform": "Market-Rover",
+ALPHAHIVE_AGENTS = [
+    {"id": "A", "role": "Portfolio Manager", "emoji": "📁", "platform": "AlphaHive",
      "model": "gemini-3-flash-preview", "goal": "Read and process user's stock portfolio from CSV.",
      "tools": ["read_portfolio", "calculate_portfolio_risk_tool"], "status": "Active"},
-    {"id": "B", "role": "Market Impact Strategist", "emoji": "🌐", "platform": "Market-Rover",
+    {"id": "B", "role": "Market Impact Strategist", "emoji": "🌐", "platform": "AlphaHive",
      "model": "gemini-3-flash-preview", "goal": "Monitor macro events, global cues, corporate actions & news.",
      "tools": ["search_market_news", "get_global_cues", "get_corporate_actions"], "status": "Active"},
-    {"id": "G", "role": "Institutional Shadow Analyst", "emoji": "🕵️", "platform": "Market-Rover",
+    {"id": "G", "role": "Institutional Shadow Analyst", "emoji": "🕵️", "platform": "AlphaHive",
      "model": "gemini-3-flash-preview", "goal": "Detect accumulation/distribution traps.",
      "tools": ["analyze_sector_flow_tool", "fetch_block_deals_tool"], "status": "Active"},
-    {"id": "H", "role": "Traditional Timing Analyst", "emoji": "🪔", "platform": "Market-Rover",
+    {"id": "H", "role": "Traditional Timing Analyst", "emoji": "🪔", "platform": "AlphaHive",
      "model": "gemini-3-flash-preview", "goal": "Subha Muhurtham and seasonal timing windows.",
      "tools": ["fetch_subha_muhurtham_tool", "analyze_traditional_calendar_tool"], "status": "Active"},
 ]
@@ -119,7 +119,7 @@ def _load_file_memories() -> list[dict]:
 
 @router.get("/agents")
 async def list_agents(platform: str | None = None):
-    all_agents = MARKET_ROVER_AGENTS
+    all_agents = ALPHAHIVE_AGENTS
     agents = all_agents
     if platform and platform != "All":
         agents = [a for a in all_agents if a["platform"] == platform]
@@ -129,7 +129,7 @@ async def list_agents(platform: str | None = None):
         "agents": agents,
         "counts": {
             "total": len(all_agents),
-            "market_rover": len(MARKET_ROVER_AGENTS),
+            "alphahive": len(ALPHAHIVE_AGENTS),
         },
     }
 

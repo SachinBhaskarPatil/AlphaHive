@@ -1,5 +1,5 @@
 """
-CLI Wrapper for Market-Rover Workflow Tracking
+CLI Wrapper for AlphaHive Workflow Tracking
 Usage:
     python -m utils.tracking start <workflow_name>
     python -m utils.tracking stop <session_id> [success|failed]
@@ -10,7 +10,7 @@ import argparse
 from utils.metrics import track_workflow_start, track_workflow_end, track_workflow_event
 
 def main():
-    parser = argparse.ArgumentParser(description="Market-Rover Workflow Tracker")
+    parser = argparse.ArgumentParser(description="AlphaHive Workflow Tracker")
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Start Command

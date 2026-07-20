@@ -1,9 +1,9 @@
-# Market-Rover v5.0 Migration Status
+# AlphaHive v5.0 Migration Status
 
 > **Migration Goal (COMPLETE)**: The legacy root `app.py` has been fully replaced by a
 > production-grade React 19 frontend + FastAPI backend architecture and removed from the
 > repo, mirroring the InvestBrand and Pledge Rover satellite module patterns. Deployed as
-> two separate Cloud Run services: `market-rover-api` (backend) and `market-rover-ui` (frontend).
+> two separate Render services: `alphahive-api` (backend) and `alphahive-web` (frontend).
 
 ---
 
@@ -21,7 +21,7 @@
 | Item | Status | Notes |
 |------|--------|-------|
 | Backend: FastAPI server (`server.py`) | DONE | Auth, analyze, profile, forecast endpoints |
-| Backend: LangGraph graph (`market_rover_graph.py`) | DONE | 10-node parallel graph |
+| Backend: LangGraph graph (`alphahive_graph.py`) | DONE | 10-node parallel graph |
 | Backend: Agent nodes (10x) | DONE | retrieval, strategy, sentiment, technicals, traditional, dividend, sector, shadow, forensic, reporting |
 | Backend: State schema (`state.py`) | DONE | Full AgentState TypedDict |
 | Backend: DB manager (`db_manager.py`) | DONE | asyncpg, user_profiles, agent_memory_ltm, social_shares |
@@ -39,15 +39,15 @@
 
 | Item | Status | Notes |
 |------|--------|-------|
-| `market_rover/Dockerfile` | DONE | Multi-stage: React build + FastAPI. Mirrors Pledge Rover pattern |
-| `market_rover/docker-compose.yml` | DONE | backend + frontend + postgres services |
-| `market_rover/backend/.env.example` | DONE | All required env vars documented |
-| `market_rover/frontend/.env.example` | DONE | VITE prefix vars |
-| `market_rover/frontend/nginx.conf` | DONE | SPA routing + /api proxy to backend |
-| `market_rover/frontend/vite.config.js` | UPDATED | Added /api proxy for local dev |
-| `market_rover/backend/src/config/database.py` | DONE | Cloud SQL + local asyncpg pool |
-| `market_rover/backend/src/routes/__init__.py` | DONE | Router extracted from server.py |
-| `.github/workflows/market_rover_deploy.yml` | DONE | Mirrors investbrand_deploy.yml pattern |
+| `AlphaHive/Dockerfile` | DONE | Multi-stage: React build + FastAPI. Mirrors Pledge Rover pattern |
+| `AlphaHive/docker-compose.yml` | DONE | backend + frontend + postgres services |
+| `AlphaHive/backend/.env.example` | DONE | All required env vars documented |
+| `AlphaHive/frontend/.env.example` | DONE | VITE prefix vars |
+| `AlphaHive/frontend/nginx.conf` | DONE | SPA routing + /api proxy to backend |
+| `AlphaHive/frontend/vite.config.js` | UPDATED | Added /api proxy for local dev |
+| `AlphaHive/backend/src/config/database.py` | DONE | Cloud SQL + local asyncpg pool |
+| `AlphaHive/backend/src/routes/__init__.py` | DONE | Router extracted from server.py |
+| `render.yaml` | DONE | Render blueprint: alphahive-web + alphahive-api + alphahive-db |
 
 ---
 
@@ -64,18 +64,17 @@
 | Backend: `/api/heatmap/{ticker}` route | PENDING | yfinance-based monthly returns matrix |
 | Backend: Tests | PENDING | Mirror pledge_rover/backend test structure |
 | DB schema migrations | PENDING | SQL migration file needed for prod Cloud SQL |
-| Favicon / branding assets | PENDING | `market_rover/frontend/public/favicon.svg` |
+| Favicon / branding assets | PENDING | `AlphaHive/frontend/public/favicon.svg` |
 
 ---
 
-## Cloud Run Target Services
+## Render Target Services
 
-| Service | Name | URL (post-deploy) |
-|---------|------|-------------------|
-| Backend API | `market-rover-api` | `https://market-rover-api-9514347926.us-central1.run.app` |
-| Frontend UI | `market-rover-ui` | `https://market-rover-ui-9514347926.us-central1.run.app` |
-
-Cloud SQL Instance: `market-rover:us-central1:investcraft-db` (shared instance — already exists)
+| Service | Name | URL |
+|---------|------|-----|
+| Backend API | `alphahive-api` | `https://alphahive-api.onrender.com` |
+| Frontend UI | `alphahive-web` | `https://alphahive-web.onrender.com` |
+| Database | `alphahive-db` | (Render Postgres) |
 
 ---
 
@@ -83,13 +82,13 @@ Cloud SQL Instance: `market-rover:us-central1:investcraft-db` (shared instance �
 
 ```bash
 # Backend
-cd market_rover/backend
+cd AlphaHive/backend
 pip install -r requirements.txt
 cp .env.example .env   # fill in GOOGLE_API_KEY
 uvicorn src.server:app --reload --port 8080
 
 # Frontend (separate terminal)
-cd market_rover/frontend
+cd AlphaHive/frontend
 npm install
 cp .env.example .env
 npm run dev            # http://localhost:3000
@@ -106,7 +105,7 @@ docker-compose up --build
 ## Architectural Reference
 
 ```
-market_rover/
+AlphaHive/
 ├── Dockerfile                    # Multi-stage: React build + FastAPI (Cloud Run)
 ├── docker-compose.yml            # Local dev: backend + frontend + postgres
 ├── MIGRATION_STATUS.md           # This file
@@ -116,7 +115,7 @@ market_rover/
 │   └── src/
 │       ├── server.py             # FastAPI entrypoint + all route definitions
 │       ├── state.py              # AgentState TypedDict (LangGraph)
-│       ├── market_rover_graph.py # 10-node parallel LangGraph
+│       ├── alphahive_graph.py # 10-node parallel LangGraph
 │       ├── agents/               # 10 agent nodes (async)
 │       ├── config/
 │       │   └── database.py       # asyncpg pool (Cloud SQL + local)

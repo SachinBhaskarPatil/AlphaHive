@@ -1,5 +1,5 @@
 """
-Memory Tool - Persistent Learning for Market Rover Agents
+Memory Tool - Persistent Learning for AlphaHive Agents
 """
 import json
 import os

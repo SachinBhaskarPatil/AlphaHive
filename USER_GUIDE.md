@@ -1,12 +1,12 @@
-# 🚀 Market-Rover & InvestBrand User Guide
+# 🚀 AlphaHive & InvestBrand User Guide
 
-Welcome to the **Hybrid Intelligence Funnel**. This guide will help you navigate the AI-driven features of both the Market-Rover analysis engine and the InvestBrand gamified experience.
+Welcome to the **Hybrid Intelligence Funnel**. This guide will help you navigate the AI-driven features of both the AlphaHive analysis engine and the InvestBrand gamified experience.
 
 ---
 
-## 🧠 1. Market-Rover: Institutional Grade Analysis
+## 🧠 1. AlphaHive: Institutional Grade Analysis
 
-Market-Rover uses a "Shadow Analyst" pattern to help you detect market traps and find smart money flow.
+AlphaHive uses a "Shadow Analyst" pattern to help you detect market traps and find smart money flow.
 
 ### 📥 Tab 1: Upload & Analyze
 1.  **Portfolio Upload**: Upload your stock list in `.csv` format (Ticker columns only).
@@ -67,4 +67,4 @@ InvestBrand is where AI acts as your **Personal Financial Teacher**.
 
 ---
 
-> **DISCLAIMER**: Market-Rover is an educational tool. All insights are AI-generated and do not constitute financial advice. Always consult with a registered financial advisor before trading.
+> **DISCLAIMER**: AlphaHive is an educational tool. All insights are AI-generated and do not constitute financial advice. Always consult with a registered financial advisor before trading.

@@ -68,7 +68,7 @@ class DashboardRenderer:
              ax4.axis('off')
 
         # Watermark
-        fig.text(0.98, 0.02, "Market-Rover", color='white', fontsize=18, fontweight='bold', ha='right', alpha=0.3)
+        fig.text(0.98, 0.02, "AlphaHive", color='white', fontsize=18, fontweight='bold', ha='right', alpha=0.3)
 
         # Save to buffer
         buf = io.BytesIO()
@@ -115,7 +115,7 @@ class DashboardRenderer:
                     self._plot_monthly_heatmap(ax2, returns_matrix, ticker, theme='light')
                     
                     # Watermark
-                    fig1.text(0.98, 0.02, "Market-Rover Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
+                    fig1.text(0.98, 0.02, "AlphaHive Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
                     fig1.suptitle(f"{ticker} - Executive Market Analysis", fontsize=20, color='black', fontweight='bold', y=0.98)
                     
                     pdf.savefig(fig1)
@@ -176,7 +176,7 @@ class DashboardRenderer:
                         ax_win.legend(handles=[patch_ret, line_win], loc='upper center', bbox_to_anchor=(0.5, 1.08), ncol=2, frameon=False, labelcolor='black')
 
                         # Watermark
-                        fig2.text(0.98, 0.02, "Market-Rover Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
+                        fig2.text(0.98, 0.02, "AlphaHive Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
                         pdf.savefig(fig2)
                         plt.close(fig2)
 
@@ -186,7 +186,7 @@ class DashboardRenderer:
                     fig3 = calendar_tool.plot_calendar(calendar_df_strategic)
                     
                     # Watermark (Matplotlib default style uses white bg, so use black text watermark)
-                    fig3.text(0.98, 0.02, "Market-Rover Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
+                    fig3.text(0.98, 0.02, "AlphaHive Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
                     
                     # DESCRIPTION OVERLAY (REMOVED ITALICS/SPECIAL CHARS)
                     fig3.text(0.5, 0.05, "Optimized Trading Schedule: Based on historic best BUY/SELL days. Adjusted for 2026/27 Holidays.", 
@@ -215,7 +215,7 @@ class DashboardRenderer:
                         # fig.suptitle is a Text object
                         fig4._suptitle.set_text(f"Subha Muhurta Trading Calendar {calendar_tool.buy_year}-{calendar_tool.sell_year}")
                         
-                        fig4.text(0.98, 0.02, "Market-Rover Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
+                        fig4.text(0.98, 0.02, "AlphaHive Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
                         fig4.text(0.5, 0.05, "Auspicious Dates: Based on Hindu Panchang & Market Tradition. Optimized for 2026/27.", 
                                   ha='center', fontsize=10, color='#333333')
                         
@@ -232,7 +232,7 @@ class DashboardRenderer:
                         
                         self._plot_calendar_table(ax_table, calendar_df_strategic)
                         
-                        fig5.text(0.98, 0.02, "Market-Rover Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
+                        fig5.text(0.98, 0.02, "AlphaHive Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
                         fig5.suptitle(f"{ticker} - Detailed Seasonality Data", fontsize=18, color='black', fontweight='bold', y=0.95)
                         
                         pdf.savefig(fig5)
@@ -262,7 +262,7 @@ class DashboardRenderer:
                         f"2. Compounded Annual Growth Rate (Historical Momentum)\n"
                         f"3. Volatility-Adjusted Scenarios\n\n"
                         f"DISCLAIMER:\n"
-                        f"This report is for educational purposes only. Market-Rover uses statistical\n"
+                        f"This report is for educational purposes only. AlphaHive uses statistical\n"
                         f"models to project future possibilities based on past data.\n"
                         f"It does not constitute financial advice.\n"
                     )
@@ -270,7 +270,7 @@ class DashboardRenderer:
                     ax_text.text(0.1, 0.8, summary_text, color='black', fontsize=14, family='monospace', va='top')
                     
                     # Watermark
-                    fig6.text(0.98, 0.02, "Market-Rover Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
+                    fig6.text(0.98, 0.02, "AlphaHive Report", color='black', fontsize=12, fontweight='bold', ha='right', alpha=0.5)
                     pdf.savefig(fig6)
                     plt.close(fig6)
                         

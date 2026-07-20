@@ -1,5 +1,5 @@
 """
-Advanced CrewAI Tools for Market Rover Agents
+Advanced CrewAI Tools for AlphaHive Agents
 """
 from crewai.tools import tool
 import json

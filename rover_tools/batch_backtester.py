@@ -221,7 +221,7 @@ def run_batch_backtest():
         emailer = EmailManager()
         if emailer.is_configured():
             print("📧 Sending Email Report...")
-            subject = f"Market-Rover Strategy Report: {datetime.now().strftime('%d %b %Y')}"
+            subject = f"AlphaHive Strategy Report: {datetime.now().strftime('%d %b %Y')}"
             emailer.send_email(subject, email_body, is_html=True)
         else:
             print("⚠️ Email not configured. Skipping notification.")

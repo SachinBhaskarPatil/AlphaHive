@@ -1,8 +1,8 @@
 """
-conftest.py — Test bootstrap for market_rover/backend/tests/
+conftest.py — Test bootstrap for AlphaHive/backend/tests/
 
 Problem: agent nodes import from rover_tools.* which is a root-level
-         shared package, not available inside market_rover/backend/.
+         shared package, not available inside AlphaHive/backend/.
 
 Solution: Inject stub MagicMock modules for every rover_tools sub-package
           before any test module is collected. This means all rover_tools

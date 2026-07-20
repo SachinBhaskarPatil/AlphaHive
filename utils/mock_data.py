@@ -1,5 +1,5 @@
 """
-Mock data generator for testing Market-Rover 2.0 without API calls
+Mock data generator for testing AlphaHive 2.0 without API calls
 Simulates realistic analysis results for testing UI and workflows
 """
 import random

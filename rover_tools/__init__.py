@@ -1,1 +1,1 @@
-"""Custom tools package for Market Rover."""
+"""Custom tools package for AlphaHive."""
