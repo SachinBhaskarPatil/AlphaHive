@@ -14,7 +14,7 @@ langchain-google-genai~=4.2.0
 plotly>=6.5.0
 matplotlib>=3.10.8
 seaborn>=0.13.2
-Pillow>=11.3.0
+Pillow>=12.3.0
 
 # Data, Analytics & Scraping
 pandas>=2.2.3
