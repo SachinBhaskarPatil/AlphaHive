@@ -12,6 +12,8 @@ services:
     name: alphahive-api
     runtime: python
     plan: free
+    branch: main
+    autoDeployTrigger: commit
     rootDir: AlphaHive/backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn src.server:app --host 0.0.0.0 --port $PORT
@@ -38,6 +40,9 @@ services:
   - type: web
     name: alphahive-web
     runtime: static
+    plan: free
+    branch: main
+    autoDeployTrigger: commit
     rootDir: AlphaHive/frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
